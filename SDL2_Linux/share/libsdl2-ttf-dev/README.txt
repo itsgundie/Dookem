@@ -1,0 +1,1 @@
+../libsdl2-ttf-2.0-0/README.txt
