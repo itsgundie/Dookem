@@ -2,12 +2,18 @@
 #ifndef DOOKEM_H
 #define DOOKEM_H
 
-#include "stdint.h"
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <limits.h>
 
-# include "SDL.h"
-# include "SDL_mixer.h"
-# include "SDL_image.h"
-# include "SDL_ttf.h"
+
+
+# include "./SDL2_Linux/include/SDL.h"
+# include "./SDL2_Linux/include/SDL_mixer.h"
+# include "./SDL2_Linux/include/SDL_image.h"
+# include "./SDL2_Linux/include/SDL_ttf.h"
 
 
 #define PIE 3.14159265358979323846
@@ -71,12 +77,12 @@ typedef struct  s_player
 	float		angleSin;
 	float		angleCos;
 	float		yaw;
+	unsigned char	current_sector;
 	int			wsad[4];
 	int			ground;
 	int			falling;
 	int			moving;
 	int			ducking;
-	unsigned char	current_sector;
 }				t_player;
 
 typedef struct	s_ectors
@@ -120,5 +126,8 @@ typedef struct	s_dookem
 	t_visibility	visible_sectors;
 	t_renderer	render;
 }				t_dookem;
+
+void	parse_map(t_dookem *doomer);
+
 
 #endif
