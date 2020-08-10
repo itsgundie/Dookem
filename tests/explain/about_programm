@@ -1,0 +1,26 @@
+How to use this simple prototype?
+make
+./tests *map_name*
+or
+./tests "New map" *map_name* (it should be existing empty file,
+                            where new data will be placed)
+
+1) ./tests "New map" *map_name*
+while you won't quit the program (esc or red cross), you'll be able
+to draw new wall's of single sector. Every new wall will be colored
+in white.
+The first wall will have start in first click position, every next
+wall with start in previous wall's end.
+
+2) ./tests *map_name*
+You can try following combinations:
+./tests ./maps/1
+        ./maps/3
+        ./maps/4
+        or any another map that was made with programm.
+
+Player is a red dot on screen with white vector - direction.
+You can move him/her by w(go forward), s(go back), left and
+right arrows. If player is placed in sector, whole screen
+will be colored in blue, if he/she is not - screen will be
+green.

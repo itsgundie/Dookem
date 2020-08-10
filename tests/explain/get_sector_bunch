@@ -1,0 +1,19 @@
+Finding possible vision walls.
+
+It is pretty bad algorithm, but the only one for this moment.
+
+So,
+1) Select all walls, that placed in direction of player's eyes.
+It was made by vector cross product formulas. Source code you
+can see here:
+https://bisqwit.iki.fi/jutut/kuvat/programming_examples/portalrendering/vertrot.bas
+
+2) Than we are calculating distance (depth) between wall and player's position.
+It works almost right - to see more information read this topic carefully:
+grafika.me/node/980#:~:text=Расстоянием%20от%20точки%20до%20отрезка,до%20одного%20из%20концов%20отрезка
+
+3) Than I guess I'm gonna sort all walls by them depth.
+4) After that I'll check carefully, if walls from the end of list
+are overlap with walls from the begin. Every overlap wall will be
+removed from the list. There will be only those walls, that are
+visible for player for now.

@@ -1,0 +1,51 @@
+Find is player in non-convex sector right now.
+Tests:  ./tests ./maps/1
+                ./maps/3
+                ./maps/4
+                ./maps/2: map-drawing is not correct
+
+There are two ways to solve this problem:
+1) if all stored data (player->x, player->y, wall's vertex->x & wall's vertex->y)
+is written in integers, we can just use this algorithm:
+https://github.com/fabiensanglard/vanilla_duke3D/blob/master/SRC/ENGINE.C#L2733
+It returns 0 if player is not in the sector and different meaning (-1?) if he/she is.
+
+2) some mixed-up logic.
+If we will imagine one TRACE from (x1 == 0, y1 == player->y) to
+(x2 == player->x, y2 == player->y), than we will see that:
+a) every wall, that have (y1 < than player->y && y2 < than player->y)
+was not crossed, because it was higher, than our trace;
+b) every wall, that have (y1 > than player->y && y2 > than player->y)
+was not crossed, because it was lower, than our trace;
+
+/*
+??? Do you really wanna read this?
+
+That means, that we need to check only those walls, that have
+(y1 < player->y && y2 > player->y) or (y1 > player->y && y2 < player->y).
+So, if (player->y - y1) > 0, that means that player->y - y2 should be < 0.
+In fact, if (player->y - y1) have different sign, than (player->y - y2),
+wall with (y1, x1, y2, x2) could be crossed by our TRACE.
+
+So, if ((player->y - y1) * (player->y - y2)) < 0, than we should check, if our
+TRACE crosses the wall. What am I saying, is that if ((player->y - y1) * (player->y - y2)) > 0,
+than y1 and y2 are lower than player->y (player->y - y1 < 0, player->y - y2 < 0, - * - == +)
+or higher than player->y (player->y - y1 > 0, player->y - y2 > 0, + * + == +).
+*/
+
+c) every wall with ((player->y - wall->y1) * (player->y - wall->y2)) < 0 should be checked.
+If wall->x1 < player->x && wall->x2 < player->x, sure it was crossed by TRACE. But what if
+((player->x - wall->x1)) * ((player->x - wall->x2)) < 0 ?
+Than we need to calculate if player placed on the right hand side (rhs) or lhs.
+Vector cross product will magically solve our problem!
+
+I do not understand clearly, how does it work, so will write this explanation later.
+Long story short, at first we need to make 2 new vectors, that depends on player's
+x/y location and wall x1/x2/y1/y2. Than, our calculations should be different if v1->y < v2->y and
+v2->y < v1->y. If player was placed on the right side, vector cross product returns digit < 0,
+else - > 0. And in this case, if player was placed on the right side of wall, he/she automatically
+crosses this wall.
+
+So, generally all this algorithm will returns count of crosses from left screen side to current player
+position. It this count % 2 == 1, than player is in sector right now, if count % 2 == 0 - he/she is
+out of it.
