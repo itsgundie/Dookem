@@ -43,29 +43,50 @@ float	find_angle(data *draw, vertex w1) {
 	if (-(v1.x * check.x + v1.y * check.y) / (sqrt(v1.x * v1.x + v1.y * v1.y)
 														 * sqrt(check.x * check.x + check.y * check.y)) < 0) {
 		return (1);
-	}
+	}//проверяем, находится ли стена за правым лучом FOV
 	return (-(v1.x * v2.x + v1.y * v2.y) / (sqrt(v1.x * v1.x + v1.y * v1.y)
-	* sqrt(v2.x * v2.x + v2.y * v2.y)));
+	* sqrt(v2.x * v2.x + v2.y * v2.y)));//если стена находится за левым лучом FOV, возврат будет отрицательным
+}
+
+
+//BugBugBug! need for wall clipping!! If one point of wall is not in FOV, we have a lots of trouble!
+void	draw_wall(wall *w, sdl_win *win, data *draw) {
+	wall w1;
+	wall w2;
+	wall w3;
+	wall w4;
+
+	w1.left.y = SCREEN_HEIGHT / 2 - (10 / sqrt(pow(w->left.x - draw->m->player->x, 2) + pow(draw->m->player->y - w->left.y, 2)) * ((SCREEN_WIDTH / 2) / TANGENT_45));
+	w1.right.y = SCREEN_HEIGHT / 2 + (10 / sqrt(pow(w->left.x - draw->m->player->x, 2) + pow(draw->m->player->y - w->left.y, 2)) * ((SCREEN_WIDTH / 2) / TANGENT_45));
+	w1.left.x = (float)(SCREEN_WIDTH) * (find_angle(draw, w->left));
+	w1.left.x = w1.left.x < 0 ? 0 : w1.left.x;//если стена находится за левым лучом FOV,
+	//то она будет за левой частью экрана - пока присвоим ей 0; если стена находится за
+	//правым лучом FOV, функция find_angle вернёт 1 - умножаем 1 на SCREEN_WIDTH и получаем
+	//правую границу экрана; конечно, это временное решение
+	w1.right.x = w1.left.x;
+	w2.left.y = SCREEN_HEIGHT / 2 - (10 / sqrt(pow(w->right.x - draw->m->player->x, 2) + pow(draw->m->player->y - w->right.y, 2)) * ((SCREEN_WIDTH / 2) / TANGENT_45));
+	w2.right.y = SCREEN_HEIGHT / 2 + (10 / sqrt(pow(w->right.x - draw->m->player->x, 2) + pow(draw->m->player->y - w->right.y, 2)) * ((SCREEN_WIDTH / 2) / TANGENT_45));
+	w2.left.x = (float)(SCREEN_WIDTH) * (find_angle(draw, w->right));
+	w2.left.x = w2.left.x < 0 ? 0 : w2.left.x;
+	w2.right.x = w2.left.x;
+	w3.left = w1.left;
+	w3.right = w2.left;
+	w4.left = w1.right;
+	w4.right = w2.right;
+	draw_line(&w1, win->bmap, 0x00FF00FF);
+	draw_line(&w2, win->bmap, 0x00FF00FF);
+	draw_line(&w3, win->bmap, 0x00FF00FF);
+	draw_line(&w4, win->bmap, 0x00FF00FF);
 }
 
 void	update_3D_image(sdl_win *win, data *draw) {
 	int count = draw->m->w_count;
+
 	wall *w = &draw->m->walls[0];
-	wall w3;
-
-	w3.left.y = 0;
-	w3.right.y = SCREEN_HEIGHT - 1;
-
 	clear_all(win);
 	while (count > 0) {
 		if (possible_vision(w, draw->m->player)) {
-
-			w3.left.x = (float)(SCREEN_WIDTH) * (find_angle(draw, w->left));
-			w3.right.x = w3.left.x;
-			draw_line(&w3, win->bmap, 0x00FF00FF);
-			w3.left.x = (float)(SCREEN_WIDTH) * (find_angle(draw, w->right));
-			w3.right.x = w3.left.x;
-			draw_line(&w3, win->bmap, 0x00FF00FF);
+			draw_wall(w, win, draw);
 		}
 		w++;
 		count--;

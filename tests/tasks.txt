@@ -1,9 +1,9 @@
 GREEN rewrite all sdl_win calls to new struct with map
 YELL add opportunity to edit new map, not only to create: how can I make sector inside sector, silly?
-YELL ?make FOV for player?
 RED find segf
 GREEN make bunches detector (it would be awsome!)
 GREEN is wall overlap with another that is in the same sector?
 RED transform 1 wall to 3d
 RED clip 1 wall
 RED make triangle
+RED try to redo Wolf's destination detector

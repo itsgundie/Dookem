@@ -33,6 +33,7 @@
 #define LEFT			0
 #define RIGHT			1
 #define DEGREES_45		0.785398
+#define TANGENT_45		1.61977519054
 
 struct		s_data;
 
