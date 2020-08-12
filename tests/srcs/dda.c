@@ -5,10 +5,10 @@
 #include "../incs/test.h"
 
 void	draw_line(wall *w, unsigned char **pix_array, int color) {
-	int		x0 = w->left.x;
-	int		x1 = w->right.x;
-	int		y0 = w->left.y;
-	int		y1 = w->right.y;
+	int		x0 = w->left.x < 0 ? 0 : w->left.x > SCREEN_WIDTH ? SCREEN_WIDTH - 1 : w->left.x;
+	int		x1 = w->right.x < 0 ? 0 : w->right.x > SCREEN_WIDTH ? SCREEN_WIDTH - 1 : w->right.x;
+	int		y0 = w->left.y < 0 ? 0 : w->left.y > SCREEN_HEIGHT ? SCREEN_HEIGHT - 1 : w->left.y;
+	int		y1 = w->right.y < 0 ? 0 : w->right.y > SCREEN_HEIGHT ? SCREEN_HEIGHT - 1 : w->right.y;
 
 	int deltax = abs(x1 - x0);
 	int deltay = abs(y1 - y0);

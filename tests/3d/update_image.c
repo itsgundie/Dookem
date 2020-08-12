@@ -1,7 +1,6 @@
-//
-// Created by Hugor Chau on 8/4/20.
-//
 #include "../incs/test.h"
+
+//Wall x in screen-view!!!
 
 static int		possible_vision(wall *w, t_player *p) {
 	float tx1 = w->left.x - p->x;
@@ -27,58 +26,46 @@ void	clear_all(sdl_win *win) {
 	}
 }
 
-static float cross_product_2d(const vertex v1, const vertex v2)
-{
-	return (v1.x * v2.y - v1.y * v2.x);
-}
-
-float	find_angle(data *draw, wall w1) {
-	wall w;
-	w.right.x = cos(draw->m->player->angle) * 30 + draw->m->player->x;
-	w.right.y = sin(draw->m->player->angle) * 30 + draw->m->player->y;
-	float	c = fabs(pow((draw->m->player->x - w.right.x), 2) * pow((draw->m->player->y - w.right.y), 2));
-	float	b = pow((draw->m->player->x - w1.left.x), 2) * pow((draw->m->player->y - w1.left.y), 2);
-	float	a = pow((w.right.x - w1.left.x), 2) * pow((w.right.y - w1.left.y), 2);
-	printf("a = %f\n b = %f\n  c = %f\n", a, b, c);
-
-	return (acos((b * b + c * c - a * a) / (2 * b * c)));
+float	find_angle(data *draw, vertex w1) {
+	//1) v1 (от левой точки стены к точке игрока)
+	vertex v1;
+	v1.x = (draw->m->player->x - w1.x);
+	v1.y = (draw->m->player->y - w1.y);
+	//1) раньше было v1 (от направления взгляда игрока к левой точке стены)
+	//теперь от угла FOV (90 degrees)
+	vertex v2;
+	v2.x = (cos(draw->m->player->angle + DEGREES_45));
+	v2.y = (sin(draw->m->player->angle + DEGREES_45));
+	vertex check;
+	check.x = (cos(draw->m->player->angle - DEGREES_45));
+	check.y = (sin(draw->m->player->angle - DEGREES_45));
+	//trying to don't include points that aren't in FOV (90 degrees)
+	if (-(v1.x * check.x + v1.y * check.y) / (sqrt(v1.x * v1.x + v1.y * v1.y)
+														 * sqrt(check.x * check.x + check.y * check.y)) < 0) {
+		return (1);
+	}
+	return (-(v1.x * v2.x + v1.y * v2.y) / (sqrt(v1.x * v1.x + v1.y * v1.y)
+	* sqrt(v2.x * v2.x + v2.y * v2.y)));
 }
 
 void	update_3D_image(sdl_win *win, data *draw) {
 	int count = draw->m->w_count;
 	wall *w = &draw->m->walls[0];
-	wall w1;
-	wall w2;
 	wall w3;
-	w1.left.y = 0;
-	w1.left.x = SCREEN_WIDTH / 2;
-	w2.left.y = 0;
-	w2.left.x = SCREEN_WIDTH / 2;
+
+	w3.left.y = 0;
+	w3.right.y = SCREEN_HEIGHT - 1;
 
 	clear_all(win);
 	while (count > 0) {
-		vertex v1; v1.x = draw->m->player->x; v1.y = draw->m->player->y;// w->left.x
-		vertex v2; v2.x = w->left.x; v2.y = w->left.y;
-		w1.right.x = cross_product_2d(v1, v2);
-		w1.right.y = SCREEN_HEIGHT / 2;
-		v2.x = w->right.x; v2.y = w->right.y;
-		w2.right.x = cross_product_2d(v1, v2);//return ((fabs(p->x - w->left.x)));
-		w2.right.y = SCREEN_HEIGHT / 2;
-		w3.left.y = 0;
-		w3.right.y = SCREEN_HEIGHT - 1;
 		if (possible_vision(w, draw->m->player)) {
-//			find_angle(draw, *w);
-//			w3.left.x = SCREEN_WIDTH / 2 * /* угол от начала в процентном соотношении */
-//			((M_PI / 2) */* угол от начала */((M_PI / 4 - /* угол */find_angle(draw, *w)) / 100));// подумать, как перевести в экранный x
-//			w3.right.x = w3.left.x;
-			printf("your angle: %f\n", find_angle(draw, *w));
-//			draw_line(&w3, win->bmap, 0x00FF00FF);
-//			1) find angles: arccos((u1v1 + u2v2) / (||u|| * ||v||))
-//			2) find how it depends on FOV (90 degrees)
-//			float f1 = acos((u1v1 + u2v2) / (||u|| * ||v||))
-//			draw_line(&w1, win->bmap, 0x00FFFFFF);
-//			draw_line(&w2, win->bmap, 0x00FF00FF);
-//			count = 0;
+
+			w3.left.x = (float)(SCREEN_WIDTH) * (find_angle(draw, w->left));
+			w3.right.x = w3.left.x;
+			draw_line(&w3, win->bmap, 0x00FF00FF);
+			w3.left.x = (float)(SCREEN_WIDTH) * (find_angle(draw, w->right));
+			w3.right.x = w3.left.x;
+			draw_line(&w3, win->bmap, 0x00FF00FF);
 		}
 		w++;
 		count--;

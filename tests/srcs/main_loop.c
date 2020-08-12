@@ -49,6 +49,48 @@ void	clear_bitmap(sdl_win *win, data *draw) {
 		}
 		i++;
 	}
+
+
+
+	wall w6;
+	w6.left.x = draw->m->player->x + 30 * sin(draw->m->player->angle);
+	w6.left.y = draw->m->player->y - 30 * cos(draw->m->player->angle);
+
+	w6.right.x = draw->m->player->x;
+	w6.right.y = draw->m->player->y;
+	draw_line(&w6, win->bmap, 0x00FFFF00);
+//red vectors are FOV(?)
+	w6.left.x = draw->m->player->x + 30 * sin(draw->m->player->angle + DEGREES_45);
+	w6.left.y = draw->m->player->y - 30 * cos(draw->m->player->angle + DEGREES_45);
+	draw_line(&w6, win->bmap, 0x00FF0000);
+	w6.left.x = draw->m->player->x - 30 * sin(draw->m->player->angle - DEGREES_45);
+	w6.left.y = draw->m->player->y + 30 * cos(draw->m->player->angle - DEGREES_45);
+	draw_line(&w6, win->bmap, 0x000000FF);
+
+//	wall w5;
+////	w.right.x = cos(draw->m->player->angle) * 30;
+////	w.right.y = sin(draw->m->player->angle) * 30;
+//	w5.left.x = draw->m->player->x;
+//	w5.left.y = draw->m->player->y;
+////	w.left.x = -w.right.x * cos(draw->m->player->angle);
+//	w5.right.x = wal[0].left.x;
+//	w5.right.y =  wal[0].left.y;
+//	draw_line(&w5, win->bmap, 0x00FF00FF);
+
+//	wall w7;
+//	w.right.x = cos(draw->m->player->angle) * 30;
+//	w.right.y = sin(draw->m->player->angle) * 30;
+//1) найти длину нового вектора
+//1) найти катет - знаю гипотенузу, если что
+//	w7.left.x = wal[0].left.x - 60 * cos(draw->m->player->angle);
+//	w7.left.y = wal[0].left.y - 60 * sin(draw->m->player->angle);
+////	w.right.x = cos(draw->m->player->angle) * 15 + draw->m->player->x;
+////	w.right.y = sin(draw->m->player->angle) * 15 + draw->m->player->y;
+////	w.left.x = -w.right.x * cos(draw->m->player->angle);
+//	w7.right.x = wal[0].left.x;
+//	w7.right.y =  wal[0].left.y;
+//	draw_line(&w7, win->bmap, 0x000000FF);
+
 	if (draw->m->is_new != TRUE) {
 		draw_player(win, draw);
 	}
@@ -95,7 +137,6 @@ void main_loop(sdl_win *win, sdl_win *win3d, data *draw) {
                 SDL_Quit();
                 exit(0);
             }
-
             if (event.type == SDL_KEYDOWN) {
                 if (event.key.keysym.sym == SDLK_ESCAPE)
                     quit = 1;

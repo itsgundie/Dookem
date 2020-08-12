@@ -30,6 +30,9 @@
 #define NOT_NULL		(void *)(size_t)1
 #define WIN_NAME		"1 test: where is player placed on non-convex sector?"
 #define WIN_3D			"3d test: how to render?"
+#define LEFT			0
+#define RIGHT			1
+#define DEGREES_45		0.785398
 
 struct		s_data;
 

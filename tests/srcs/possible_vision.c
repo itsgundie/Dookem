@@ -33,8 +33,6 @@ float	find_destination(wall *w1, t_player *p) {
 	w->left = w1->left.x < w1->right.x ? w1->left : w1->right;
 	w->right = w1->right.x < w1->left.x ? w1->right : w1->left;
 	if (cross_product_2d(w->right, w->left) <= 0 || cross_product_2d(w->left, w->right) <= 0) {//слишком широкое определение, нужно только определение тупого угла здесь
-//		if (arccos((u1v1 + u2v2) / (||u|| * ||v||)))
-//		if ((cross_product_2d(w1->left, w1->right)) / fabs((w1->left.x - w1->left.y) * (w1->right.x - w->right.y)) < 0)
 			return pow((pow((p->x - w->right.x), 2) + pow((p->y - w->right.y), 2)), 0.5);
 	}
 	if ((int)(w->right.x - w->left.x) == 0)
@@ -47,17 +45,6 @@ float	find_destination(wall *w1, t_player *p) {
 	float y = (((a * 2 / b) * w->left.y + a * (p->x - w->left.x) + b * p->y) / ((a * 2 / b) + b) - p->y);
 	float x = ((a / b) * (y - w->left.y) + w->left.x - p->x);
 	return (sqrt((x * x) + (y * y)));
-}
-
-//void	void_swap(float **x1, float **x2) {
-//	float	x;
-//	x = *x1;
-//	*x1 = *x2;
-//	*x2 = x;
-//}
-
-void	select_bunch() {
-
 }
 
 void	sort_by_depth(wall **w, float **depth, int *count) {

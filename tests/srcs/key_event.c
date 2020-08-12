@@ -9,9 +9,9 @@ void	key_event(SDL_Event *event, data *draw) {
 	if (event->key.keysym.sym == SDLK_ESCAPE)
 		;
 	if (event->key.keysym.sym == SDLK_RIGHT)
-		draw->m->player->angle += 0.1;
+		draw->m->player->angle += 0.01;
 	if (event->key.keysym.sym == SDLK_LEFT)
-		draw->m->player->angle -= 0.1;
+		draw->m->player->angle -= 0.01;
 	if (event->key.keysym.sym == SDLK_w) {
 		draw->m->player->x += cos(draw->m->player->angle) * 2;
 		draw->m->player->y += sin(draw->m->player->angle) * 2;
