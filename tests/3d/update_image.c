@@ -1,3 +1,4 @@
+  
 #include "../incs/test.h"
 
 //Wall x in screen-view!!!
@@ -84,6 +85,18 @@ void	draw_wall(wall *w_origin, sdl_win *win, data *draw) {
 
 	w->left = w_origin->left;
 	w->right = w_origin->right;
+	
+	w1.left.x = (float)(SCREEN_WIDTH) * (find_angle(draw, w->left));
+	w1.left.x = w1.left.x < 0 ? 0 : w1.left.x >= SCREEN_WIDTH ? SCREEN_WIDTH - 1 : w1.left.x;//если стена находится за левым лучом FOV,
+	//то она будет за левой частью экрана - пока присвоим ей 0; если стена находится за
+	//правым лучом FOV, функция find_angle вернёт 1 - умножаем 1 на SCREEN_WIDTH и получаем
+	//правую границу экрана; конечно, это временное решение
+	w1.right.x = w1.left.x;
+	//длина стены: каноническая длина стены от сектора (в данном случае 10) / расстояние до вершины стены / ((кол-во пикселей экрана по х / 2) / тангенс половины угла обзора игрока (45 градусов)
+	w2.left.x = (float)(SCREEN_WIDTH) * (find_angle(draw, w->right));
+	w2.left.x = w2.left.x < 0 ? 0 : w2.left.x >= SCREEN_WIDTH ? SCREEN_WIDTH - 1 : w2.left.x;
+	w2.right.x = w2.left.x;
+
 	if (is_visible_dot(draw, w->left) == -1) {
 		w->left = w->right;//пока что так, но нужно найти точку пересечения
 		//вектора 	x = (cos(draw->m->player->angle)); y = (sin(draw->m->player->angle)); и
@@ -94,23 +107,13 @@ void	draw_wall(wall *w_origin, sdl_win *win, data *draw) {
 	}
 	w1.left.y = SCREEN_HEIGHT / 2 - (10 / sqrt(pow(w->left.x - draw->m->player->x, 2) + pow(draw->m->player->y - w->left.y, 2)) * ((SCREEN_WIDTH / 2) / TANGENT_45));
 	w1.right.y = SCREEN_HEIGHT / 2 + (10 / sqrt(pow(w->left.x - draw->m->player->x, 2) + pow(draw->m->player->y - w->left.y, 2)) * ((SCREEN_WIDTH / 2) / TANGENT_45));
-	w1.left.x = (float)(SCREEN_WIDTH) * (find_angle(draw, w->left));
-	w1.left.x = w1.left.x < 0 ? 0 : w1.left.x;//если стена находится за левым лучом FOV,
-	//то она будет за левой частью экрана - пока присвоим ей 0; если стена находится за
-	//правым лучом FOV, функция find_angle вернёт 1 - умножаем 1 на SCREEN_WIDTH и получаем
-	//правую границу экрана; конечно, это временное решение
-	w1.right.x = w1.left.x;
-	//длина стены: каноническая длина стены от сектора (в данном случае 10) / расстояние до вершины стены / ((кол-во пикселей экрана по х / 2) / тангенс половины угла обзора игрока (45 градусов)
-	w2.left.y = SCREEN_HEIGHT / 2 - (10 / sqrt(pow(w->right.x - draw->m->player->x, 2) + pow(draw->m->player->y - w->right.y, 2)) * ((SCREEN_WIDTH / 2) / TANGENT_45));
+    w2.left.y = SCREEN_HEIGHT / 2 - (10 / sqrt(pow(w->right.x - draw->m->player->x, 2) + pow(draw->m->player->y - w->right.y, 2)) * ((SCREEN_WIDTH / 2) / TANGENT_45));
 	w2.right.y = SCREEN_HEIGHT / 2 + (10 / sqrt(pow(w->right.x - draw->m->player->x, 2) + pow(draw->m->player->y - w->right.y, 2)) * ((SCREEN_WIDTH / 2) / TANGENT_45));
-	w2.left.x = (float)(SCREEN_WIDTH) * (find_angle(draw, w->right));
-	w2.left.x = w2.left.x < 0 ? 0 : w2.left.x;
-	w2.right.x = w2.left.x;
 	w3.left = w1.left;
 	w3.right = w2.left;
 	w4.left = w1.right;
 	w4.right = w2.right;
-	draw_line(&w1, win->bmap, 0x00FF00FF);
+    draw_line(&w1, win->bmap, 0x00FF00FF);
 	draw_line(&w2, win->bmap, 0x00FF00FF);
 	draw_line(&w3, win->bmap, 0x00FF00FF);
 	draw_line(&w4, win->bmap, 0x00FF00FF);

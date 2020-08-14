@@ -106,6 +106,7 @@ void	update_3D_image(sdl_win *win, data *draw);
 //void	update_texture(sdl_win *win, data *draw);
 void	put_bitmap(sdl_win *win);
 void	adapt_bisquit_code(wall *w, data *draw, sdl_win *win);
+vertex	find_new_dot(data *draw, wall *w, float angle);
 
 #include "3d.h"
 

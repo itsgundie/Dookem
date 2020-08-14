@@ -41,7 +41,7 @@ C_FILES = main.c \
 		 possible_vision.c
 
 C_FILES_3D = 	init_3d.c \
-                update_image.c
+                update_image2.c
 
 OBJ_FILES = $(C_FILES:.c=.o)
 OBJ_FILES_3D = $(C_FILES_3D:.c=.o)

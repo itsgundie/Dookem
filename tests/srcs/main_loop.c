@@ -43,9 +43,29 @@ void	clear_bitmap(sdl_win *win, data *draw) {
 	i = 0;
 	////////Here! I'm getting all potential visible walls for current sector
 	get_walls_in_front(draw, &wal, &w_count);
-	while (i <= w_count) {
+	while (i < w_count) {
 		if (wal[i].right.x != -1) {
 			draw_line(&wal[i], win->bmap, 0x00000000);
+
+			wall check;
+			printf("Old wall: %f, %f\n", wal[i].left.x, wal[i].left.y);
+			check.left = find_new_dot(draw, &wal[i], (draw->m->player->angle - DEGREES_45));//sin(draw->m->player->angle - DEGREES_45) / cos(draw->m->player->angle - DEGREES_45));//:)
+			if (check.left.x == -1)
+				check.left = wal[i].left;
+//			vertex v1;
+//			v1.x = (draw->m->player->x - check.left.x);
+//			v1.y = (draw->m->player->y - check.left.y);
+//			vertex check4;
+//			check4.x = (cos(draw->m->player->angle + DEGREES_45 * 2));
+//			check4.y = (sin(draw->m->player->angle + DEGREES_45 * 2));
+//			if (-(v1.x * check4.x + v1.y * check4.y) / (sqrt(v1.x * v1.x + v1.y * v1.y)
+//														* sqrt(check4.x * check4.x + check4.y * check4.y)) > 0) {
+//				printf("Is it on the right?\n");
+//			}
+			printf("new wall: %f, %f\n", check.left.x, check.left.y);
+			check.right.x =  draw->m->player->x;
+			check.right.y =  draw->m->player->y;
+			draw_line(&check, win->bmap, 0x00FFFFFF);
 		}
 		i++;
 	}
@@ -59,37 +79,13 @@ void	clear_bitmap(sdl_win *win, data *draw) {
 	w6.right.x = draw->m->player->x;
 	w6.right.y = draw->m->player->y;
 	draw_line(&w6, win->bmap, 0x00FFFF00);
-//red vectors are FOV(?)
+//red vectors are FOV
 	w6.left.x = draw->m->player->x + 30 * sin(draw->m->player->angle + DEGREES_45);
 	w6.left.y = draw->m->player->y - 30 * cos(draw->m->player->angle + DEGREES_45);
 	draw_line(&w6, win->bmap, 0x00FF0000);
 	w6.left.x = draw->m->player->x - 30 * sin(draw->m->player->angle - DEGREES_45);
 	w6.left.y = draw->m->player->y + 30 * cos(draw->m->player->angle - DEGREES_45);
 	draw_line(&w6, win->bmap, 0x000000FF);
-
-//	wall w5;
-////	w.right.x = cos(draw->m->player->angle) * 30;
-////	w.right.y = sin(draw->m->player->angle) * 30;
-//	w5.left.x = draw->m->player->x;
-//	w5.left.y = draw->m->player->y;
-////	w.left.x = -w.right.x * cos(draw->m->player->angle);
-//	w5.right.x = wal[0].left.x;
-//	w5.right.y =  wal[0].left.y;
-//	draw_line(&w5, win->bmap, 0x00FF00FF);
-
-//	wall w7;
-//	w.right.x = cos(draw->m->player->angle) * 30;
-//	w.right.y = sin(draw->m->player->angle) * 30;
-//1) найти длину нового вектора
-//1) найти катет - знаю гипотенузу, если что
-//	w7.left.x = wal[0].left.x - 60 * cos(draw->m->player->angle);
-//	w7.left.y = wal[0].left.y - 60 * sin(draw->m->player->angle);
-////	w.right.x = cos(draw->m->player->angle) * 15 + draw->m->player->x;
-////	w.right.y = sin(draw->m->player->angle) * 15 + draw->m->player->y;
-////	w.left.x = -w.right.x * cos(draw->m->player->angle);
-//	w7.right.x = wal[0].left.x;
-//	w7.right.y =  wal[0].left.y;
-//	draw_line(&w7, win->bmap, 0x000000FF);
 
 	if (draw->m->is_new != TRUE) {
 		draw_player(win, draw);
