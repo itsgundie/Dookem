@@ -45,9 +45,8 @@ void	draw_line(wall *w, unsigned char **pix_array, int color) {
 			dirx = -1;
 		int deltaerr = (deltax + 1);
 		while (y != y1) {
-			if (x < 0 || y < 0 || x >= SCREEN_WIDTH || y >= SCREEN_HEIGHT)
-				break;
-			((int *)(*pix_array))[((x) + y * SCREEN_WIDTH) - 0] = color;
+			if (x >= 0 && y >= 0 && x < SCREEN_WIDTH && y < SCREEN_HEIGHT)
+				((int *)(*pix_array))[((x) + y * SCREEN_WIDTH) - 0] = color;
 			error = error + deltaerr;
 			if (error >= (deltay + 1)) {
 				x = x + dirx;

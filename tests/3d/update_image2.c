@@ -57,7 +57,6 @@ vertex	find_new_dot(data *draw, wall *w, float angle) {
 	//1) с какой стороны вектора ищем пересечение? Справа или слева?
 	vertex v1 = w->left.x <= w->right.x ? w->left : w->right;
 	vertex v2 = w->left.x <= w->right.x ? w->right : w->left;
-	printf("Angle = %f\n", cos(angle));
 	float px1 = cos(angle) >= 0 ? draw->m->player->x : draw->m->player->x + cos(angle);
 	float py1 = cos(angle) >= 0 ? draw->m->player->y : draw->m->player->y + sin(angle);
 	float px2 = cos(angle) < 0 ? draw->m->player->x : draw->m->player->x + cos(angle);
@@ -74,11 +73,9 @@ vertex	find_new_dot(data *draw, wall *w, float angle) {
 	res.x = ((b1 - b2) / (a2 - a1));
 	res.y = (a1 * res.x + b1);
 
-	res.x = res.x;
-	res.y = res.y;
-//	if (res.x < v1.x || res.x > v2.x) {
-//		res.x = -1;
-//	}
+	if (res.x < v1.x || res.x > v2.x) {
+		res.x = -1;
+	}
 	return res;
 }
 
@@ -105,7 +102,7 @@ vertex	change_dot(data *draw, vertex w1, wall *full_wall) {
 	if (-(v1.x * check4.x + v1.y * check4.y) / (sqrt(v1.x * v1.x + v1.y * v1.y)
 											  * sqrt(check4.x * check4.x + check4.y * check4.y)) < 0) {
 		//точка слева от направления взгляда игрока
-		res = (find_new_dot(draw, full_wall, draw->m->player->angle - DEGREES_45));
+		res = (find_new_dot(draw, full_wall, draw->m->player->angle - DEGREES_45));//-
 	} else {
 		res = (find_new_dot(draw, full_wall, draw->m->player->angle + DEGREES_45));
 	}
@@ -120,8 +117,13 @@ void	draw_wall(wall *w_origin, sdl_win *win, data *draw) {
 	wall w3;
 	wall w4;
 
-	w->right = change_dot(draw, w_origin->right, w_origin);
-	w->left = change_dot(draw, w_origin->left, w_origin);
+	w->right = w_origin->right;
+	w->left = w_origin->left;
+	w->right = change_dot(draw, w->right, w);
+	w->left = change_dot(draw, w->left, w);
+//	w->right = change_dot(draw, w->right, w);
+	if (w->left.x < 0 || w->right.x < 0)
+		return ;
 	float w_h = 10 / sqrt(pow(w->left.x - draw->m->player->x, 2) + pow(draw->m->player->y - w->left.y, 2)) * ((SCREEN_WIDTH / 2) / TANGENT_45);
 	w1.left.y = SCREEN_HEIGHT / 2 - w_h;
 	w1.right.y = SCREEN_HEIGHT / 2 + w_h;

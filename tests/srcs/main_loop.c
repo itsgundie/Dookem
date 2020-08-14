@@ -47,25 +47,25 @@ void	clear_bitmap(sdl_win *win, data *draw) {
 		if (wal[i].right.x != -1) {
 			draw_line(&wal[i], win->bmap, 0x00000000);
 
-			wall check;
-			printf("Old wall: %f, %f\n", wal[i].left.x, wal[i].left.y);
-			check.left = find_new_dot(draw, &wal[i], (draw->m->player->angle - DEGREES_45));//sin(draw->m->player->angle - DEGREES_45) / cos(draw->m->player->angle - DEGREES_45));//:)
-			if (check.left.x == -1)
-				check.left = wal[i].left;
+//			wall check;
+//			printf("Old wall: %f, %f\n", wal[i].left.x, wal[i].left.y);
+//			check.left = find_new_dot(draw, &wal[i], (draw->m->player->angle - DEGREES_45));//sin(draw->m->player->angle - DEGREES_45) / cos(draw->m->player->angle - DEGREES_45));//:)
+//			if (check.left.x == -1)
+//				check.left = wal[i].left;
 //			vertex v1;
-//			v1.x = (draw->m->player->x - check.left.x);
-//			v1.y = (draw->m->player->y - check.left.y);
+//			v1.x = (draw->m->player->x - wal[i].right.x);
+//			v1.y = (draw->m->player->y - wal[i].right.y);
 //			vertex check4;
 //			check4.x = (cos(draw->m->player->angle + DEGREES_45 * 2));
 //			check4.y = (sin(draw->m->player->angle + DEGREES_45 * 2));
-//			if (-(v1.x * check4.x + v1.y * check4.y) / (sqrt(v1.x * v1.x + v1.y * v1.y)
-//														* sqrt(check4.x * check4.x + check4.y * check4.y)) > 0) {
-//				printf("Is it on the right?\n");
-//			}
-			printf("new wall: %f, %f\n", check.left.x, check.left.y);
-			check.right.x =  draw->m->player->x;
-			check.right.y =  draw->m->player->y;
-			draw_line(&check, win->bmap, 0x00FFFFFF);
+////			if (-(v1.x * check4.x + v1.y * check4.y) / (sqrt(v1.x * v1.x + v1.y * v1.y)
+////														* sqrt(check4.x * check4.x + check4.y * check4.y)) > 0) {
+////				printf("Is it on the right?\n");
+////			}
+//			printf("new wall: %f, %f\n", check.left.x, check.left.y);
+//			check.right.x =  draw->m->player->x;
+//			check.right.y =  draw->m->player->y;
+//			draw_line(&check, win->bmap, 0x00FFFFFF);
 		}
 		i++;
 	}
