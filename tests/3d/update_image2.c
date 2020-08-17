@@ -1,8 +1,5 @@
 #include "../incs/test.h"
-
 #include "../incs/test.h"
-
-//Wall x in screen-view!!!
 
 static int		possible_vision(wall *w, t_player *p) {
 	float tx1 = w->left.x - p->x;
@@ -29,37 +26,32 @@ void	clear_all(sdl_win *win) {
 }
 
 float	find_angle(data *draw, vertex w1) {
-	//1) v1 (от левой точки стены к точке игрока)
 	vertex v1;
 	v1.x = (draw->m->player->x - w1.x);
 	v1.y = (draw->m->player->y - w1.y);
-	//1) раньше было v1 (от направления взгляда игрока к левой точке стены)
-	//теперь от угла FOV (90 degrees)
 	vertex v2;
 	v2.x = (cos(draw->m->player->angle + DEGREES_45));
 	v2.y = (sin(draw->m->player->angle + DEGREES_45));
 	float res = (-(v1.x * v2.x + v1.y * v2.y) / (sqrt(v1.x * v1.x + v1.y * v1.y)
-											* sqrt(v2.x * v2.x + v2.y * v2.y))) - 0.2;//если стена находится за левым лучом FOV, возврат будет отрицательным
+											* sqrt(v2.x * v2.x + v2.y * v2.y))) - 0.2;
 	return res / cos(res);
 }
 
 vertex	find_new_dot(data *draw, wall *w, float angle) {
-
 	vertex res;
-	//1) с какой стороны вектора ищем пересечение? Справа или слева?
+
 	vertex v1 = w->left.x <= w->right.x ? w->left : w->right;
 	vertex v2 = w->left.x <= w->right.x ? w->right : w->left;
+
 	if (fabs(sin(angle)) <= 0.00001 || fabs(cos(angle)) <= 0.00001)
 		angle += 0.001;
 	float px1 = cos(angle) > 0 ? draw->m->player->x : draw->m->player->x + cos(angle);
 	float py1 = cos(angle) > 0 ? draw->m->player->y : draw->m->player->y + sin(angle);
-	float px2 = cos(angle) < 0 ? draw->m->player->x : draw->m->player->x + cos(angle);
-	float py2 = cos(angle) < 0 ? draw->m->player->y : draw->m->player->y + sin(angle);
 
-	float a1 = /*tan(angle);//*/((-py2 + py1) / (-px2 + px1));//tan обеих прямых
+	float a1 = tan(angle);
 	float a2 = ((-v2.y + v1.y) / (-v2.x + v1.x));
 
-	float b1 = (py1 - (a1 * px1));//коэффициент смещения
+	float b1 = (py1 - (a1 * px1));
 	float b2 = (v1.y - a2 * v1.x);
 
 	res.x = ((b1 - b2) / (a2 - a1));
@@ -70,34 +62,34 @@ vertex	find_new_dot(data *draw, wall *w, float angle) {
 	return res;
 }
 
+int	from_back(data *draw, vertex w1, float angle) {
+	vertex v1;
+	vertex check;
+
+	v1.x = (draw->m->player->x - w1.x);
+	v1.y = (draw->m->player->y - w1.y);
+	check.x = (cos(angle));
+	check.y = (sin(angle));
+	if ((-(v1.x * check.x + v1.y * check.y) / (sqrt(v1.x * v1.x + v1.y * v1.y)
+												 * sqrt(check.x * check.x + check.y * check.y)) < 0))
+		return TRUE;
+	return FALSE;
+}
+
 vertex	change_dot(data *draw, vertex w1, wall *full_wall) {
 	vertex v1;
 	v1.x = (draw->m->player->x - w1.x);
 	v1.y = (draw->m->player->y - w1.y);
-	vertex check4;
 	vertex res = w1;
-	check4.x = (cos(draw->m->player->angle));
-	check4.y = (sin(draw->m->player->angle));
-	if ((-(v1.x * check4.x + v1.y * check4.y) / (sqrt(v1.x * v1.x + v1.y * v1.y)
-											  * sqrt(check4.x * check4.x + check4.y * check4.y)) < 0))
+	if (from_back(draw, w1, draw->m->player->angle) == TRUE)
 	{
 		res = (find_new_dot(draw, full_wall, draw->m->player->angle + DEGREES_45 * 2));
 		v1.x = (draw->m->player->x - res.x); v1.y = draw->m->player->y - res.y;
-	}// проверить перекрываемость краями FOV
-		vertex v2;
-		v2.x = (cos(draw->m->player->angle + DEGREES_45));
-		v2.y = (sin(draw->m->player->angle + DEGREES_45));
-		vertex check;
-		check.x = (cos(draw->m->player->angle - DEGREES_45));
-		check.y = (sin(draw->m->player->angle - DEGREES_45));
-		if ((-(v1.x * check.x + v1.y * check.y) / (sqrt(v1.x * v1.x + v1.y * v1.y)
-													  * sqrt(check.x * check.x + check.y * check.y)) < 0))
-		{
-			res = (find_new_dot(draw, full_wall, draw->m->player->angle + DEGREES_45));
-		} else if (((-(v1.x * v2.x + v1.y * v2.y) / (sqrt(v1.x * v1.x + v1.y * v1.y)
-										  * sqrt(v2.x * v2.x + v2.y * v2.y))) < 0)) {
-			res = (find_new_dot(draw, full_wall, draw->m->player->angle - DEGREES_45));
-		}
+	}
+	if (from_back(draw, res, draw->m->player->angle - DEGREES_45) == TRUE)
+		res = (find_new_dot(draw, full_wall, draw->m->player->angle + DEGREES_45));
+	else if (from_back(draw, res, draw->m->player->angle + DEGREES_45) == TRUE)
+		res = (find_new_dot(draw, full_wall, draw->m->player->angle - DEGREES_45));
 	return (res);
 }
 
@@ -110,7 +102,6 @@ void	draw_wall(wall *w_origin, sdl_win *win, data *draw) {
 
 	w->right = change_dot(draw, w_origin->right, w_origin);
 	w->left = change_dot(draw, w_origin->left, w_origin);
-
 	if (w->left.x < 0 || w->right.x < 0)
 		return ;
 	float w_h = 20 / sqrt(pow(w->left.x - draw->m->player->x, 2) + pow(draw->m->player->y - w->left.y, 2)) * ((SCREEN_WIDTH / 2) / TANGENT_45);
@@ -118,10 +109,6 @@ void	draw_wall(wall *w_origin, sdl_win *win, data *draw) {
 	w1.right.y = SCREEN_HEIGHT / 2 + w_h;
 
 	w1.left.x = (float)SCREEN_WIDTH * find_angle(draw, w->left);
-	w1.left.x = w1.left.x < 0 ? 0 : w1.left.x;//если стена находится за левым лучом FOV,
-	//то она будет за левой частью экрана - пока присвоим ей 0; если стена находится за
-	//правым лучом FOV, функция find_angle вернёт 1 - умножаем 1 на SCREEN_WIDTH и получаем
-	//правую границу экрана; конечно, это временное решение
 	w1.right.x = w1.left.x;
 
 	//длина стены: каноническая длина стены от сектора (в данном случае 10) / расстояние до вершины стены / ((кол-во пикселей экрана по х / 2) / тангенс половины угла обзора игрока (45 градусов)
