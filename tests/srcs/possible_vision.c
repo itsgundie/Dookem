@@ -4,7 +4,7 @@
 
 #include "../incs/test.h"
 
-static int		possible_vision(wall *w, t_player *p) {
+int		possible_vision(wall *w, t_player *p) {
 	float tx1 = w->left.x - p->x;
 	float ty1 = w->left.y - p->y;
 	float tx2 = w->right.x - p->x;
