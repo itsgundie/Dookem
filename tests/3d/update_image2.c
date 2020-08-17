@@ -29,16 +29,18 @@ void	clear_all(sdl_win *win) {
 }
 
 float	find_angle(data *draw, vertex w1) {
+	//1) v1 (от левой точки стены к точке игрока)
 	vertex v1;
-	float res;
 	v1.x = (draw->m->player->x - w1.x);
 	v1.y = (draw->m->player->y - w1.y);
+	//1) раньше было v1 (от направления взгляда игрока к левой точке стены)
+	//теперь от угла FOV (90 degrees)
 	vertex v2;
-	v2.x = (cos(draw->m->player->angle + DEGREES_45 * 2));
-	v2.y = (sin(draw->m->player->angle + DEGREES_45 * 2));
-	res = (-(v1.x * v2.x + v1.y * v2.y) / (sqrt(v1.x * v1.x + v1.y * v1.y)
-											* sqrt(v2.x * v2.x + v2.y * v2.y)));
-	return ((res / cos(res)) + 1.0) / 2;
+	v2.x = (cos(draw->m->player->angle + DEGREES_45));
+	v2.y = (sin(draw->m->player->angle + DEGREES_45));
+	float res = (-(v1.x * v2.x + v1.y * v2.y) / (sqrt(v1.x * v1.x + v1.y * v1.y)
+											* sqrt(v2.x * v2.x + v2.y * v2.y))) - 0.2;//если стена находится за левым лучом FOV, возврат будет отрицательным
+	return res / cos(res);
 }
 
 vertex	find_new_dot(data *draw, wall *w, float angle) {
@@ -47,18 +49,14 @@ vertex	find_new_dot(data *draw, wall *w, float angle) {
 	//1) с какой стороны вектора ищем пересечение? Справа или слева?
 	vertex v1 = w->left.x <= w->right.x ? w->left : w->right;
 	vertex v2 = w->left.x <= w->right.x ? w->right : w->left;
-	if (fabs(sin(angle)) <= 0.00001)
-		angle += 0.001;
-	if (fabs(cos(angle)) <= 0.00001)
+	if (fabs(sin(angle)) <= 0.00001 || fabs(cos(angle)) <= 0.00001)
 		angle += 0.001;
 	float px1 = cos(angle) > 0 ? draw->m->player->x : draw->m->player->x + cos(angle);
 	float py1 = cos(angle) > 0 ? draw->m->player->y : draw->m->player->y + sin(angle);
 	float px2 = cos(angle) < 0 ? draw->m->player->x : draw->m->player->x + cos(angle);
 	float py2 = cos(angle) < 0 ? draw->m->player->y : draw->m->player->y + sin(angle);
-	if (px2 < px1) {
-		printf("error!\n");
-	}
-	float a1 = ((-py2 + py1) / (-px2 + px1));
+
+	float a1 = /*tan(angle);//*/((-py2 + py1) / (-px2 + px1));//tan обеих прямых
 	float a2 = ((-v2.y + v1.y) / (-v2.x + v1.x));
 
 	float b1 = (py1 - (a1 * px1));//коэффициент смещения
@@ -72,7 +70,7 @@ vertex	find_new_dot(data *draw, wall *w, float angle) {
 	return res;
 }
 
-vertex	change_dot(data *draw, vertex w1, vertex w2, wall *full_wall) {
+vertex	change_dot(data *draw, vertex w1, wall *full_wall) {
 	vertex v1;
 	v1.x = (draw->m->player->x - w1.x);
 	v1.y = (draw->m->player->y - w1.y);
@@ -95,7 +93,6 @@ vertex	change_dot(data *draw, vertex w1, vertex w2, wall *full_wall) {
 		if ((-(v1.x * check.x + v1.y * check.y) / (sqrt(v1.x * v1.x + v1.y * v1.y)
 													  * sqrt(check.x * check.x + check.y * check.y)) < 0))
 		{
-			//точка слева от направления взгляда игрока
 			res = (find_new_dot(draw, full_wall, draw->m->player->angle + DEGREES_45));
 		} else if (((-(v1.x * v2.x + v1.y * v2.y) / (sqrt(v1.x * v1.x + v1.y * v1.y)
 										  * sqrt(v2.x * v2.x + v2.y * v2.y))) < 0)) {
@@ -104,7 +101,6 @@ vertex	change_dot(data *draw, vertex w1, vertex w2, wall *full_wall) {
 	return (res);
 }
 
-//BugBugBug! need for wall clipping!! If one point of wall is not in FOV, we have a lots of trouble!
 void	draw_wall(wall *w_origin, sdl_win *win, data *draw) {
 	wall *w = malloc(sizeof(wall));
 	wall w1;
@@ -112,10 +108,8 @@ void	draw_wall(wall *w_origin, sdl_win *win, data *draw) {
 	wall w3;
 	wall w4;
 
-	w->right = w_origin->right;
-	w->left = w_origin->left;
-	w->right = change_dot(draw, w_origin->right, w_origin->left, w_origin);
-	w->left = change_dot(draw, w_origin->left, w_origin->right, w_origin);
+	w->right = change_dot(draw, w_origin->right, w_origin);
+	w->left = change_dot(draw, w_origin->left, w_origin);
 
 	if (w->left.x < 0 || w->right.x < 0)
 		return ;
@@ -123,7 +117,7 @@ void	draw_wall(wall *w_origin, sdl_win *win, data *draw) {
 	w1.left.y = SCREEN_HEIGHT / 2 - w_h;
 	w1.right.y = SCREEN_HEIGHT / 2 + w_h;
 
-	w1.left.x = SCREEN_WIDTH * find_angle(draw, w->left);
+	w1.left.x = (float)SCREEN_WIDTH * find_angle(draw, w->left);
 	w1.left.x = w1.left.x < 0 ? 0 : w1.left.x;//если стена находится за левым лучом FOV,
 	//то она будет за левой частью экрана - пока присвоим ей 0; если стена находится за
 	//правым лучом FOV, функция find_angle вернёт 1 - умножаем 1 на SCREEN_WIDTH и получаем
@@ -135,7 +129,7 @@ void	draw_wall(wall *w_origin, sdl_win *win, data *draw) {
 	w2.left.y = SCREEN_HEIGHT / 2 - w_h;
 	w2.right.y = SCREEN_HEIGHT / 2 + w_h;
 
-	w2.left.x = SCREEN_WIDTH * find_angle(draw, w->right);// / cos(find_angle(draw, w->right));
+	w2.left.x = (float)SCREEN_WIDTH * find_angle(draw, w->right);// / cos(find_angle(draw, w->right));
 	w2.right.x = w2.left.x;
 	w3.left = w1.left;
 	w3.right = w2.left;

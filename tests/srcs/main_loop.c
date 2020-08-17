@@ -58,7 +58,7 @@ void	clear_bitmap(sdl_win *win, data *draw) {
 		i++;
 	}
 	i = 0;
-	////////Here! I'm getting all potential visible walls for current sector
+	//Here! I'm getting all potential visible walls for current sector
 	get_walls_in_front(draw, &wal, &w_count);
 	while (i < w_count) {
 		if (wal[i].right.x != -1) {
