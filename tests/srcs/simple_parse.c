@@ -117,6 +117,7 @@ map		*simple_parse(char *map_name) {
 				m->walls[i].right.x, m->walls[i].right.y);
 	}
 	m->player->angle = 0.1;
+	m->player->inside = -1;
 	//2) почекать символы
 	//3)
 	return m;

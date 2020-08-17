@@ -24,7 +24,7 @@
 #define ERROR			"\033[38;2;200;0;30m"
 #define EOC				"\033[38;2;0m"
 #define SCREEN_WIDTH	640
-#define SCREEN_HEIGHT	480
+#define SCREEN_HEIGHT	540
 #define TRUE			1
 #define FALSE			0
 #define NOT_NULL		(void *)(size_t)1
@@ -66,6 +66,7 @@ typedef struct		s_wall {
 typedef struct		s_player {
 	float			x;
 	float			y;
+//	int				in_sector;
 	float			angle;//direction
 	wall			seeing_walls;//?
 	int				inside;
@@ -107,7 +108,7 @@ void	update_3D_image(sdl_win *win, data *draw);
 void	put_bitmap(sdl_win *win);
 void	adapt_bisquit_code(wall *w, data *draw, sdl_win *win);
 vertex	find_new_dot(data *draw, wall *w, float angle);
-
+int		is_rhs(float x, float y, wall *wal);
 #include "3d.h"
 
 #endif //TESTS_TEST_H

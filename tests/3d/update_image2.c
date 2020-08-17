@@ -79,10 +79,13 @@ vertex	find_new_dot(data *draw, wall *w, float angle) {
 	return res;
 }
 
-vertex	change_dot(data *draw, vertex w1, wall *full_wall) {
+vertex	change_dot(data *draw, vertex w1, vertex w2, wall *full_wall) {
 	vertex v1;//replace with "check1"
+	vertex v3;
 	v1.x = (draw->m->player->x - w1.x);
 	v1.y = (draw->m->player->y - w1.y);
+	v3.x = w2.x;//(cos(draw->m->player->angle + DEGREES_45 * 2));
+	v3.y = w2.y;//(sin(draw->m->player->angle + DEGREES_45 * 2));
 	vertex v2;//replace with "check2"
 	v2.x = (cos(draw->m->player->angle + DEGREES_45));
 	v2.y = (sin(draw->m->player->angle + DEGREES_45));
@@ -98,13 +101,20 @@ vertex	change_dot(data *draw, vertex w1, wall *full_wall) {
 			((-(v1.x * v2.x + v1.y * v2.y) / (sqrt(v1.x * v1.x + v1.y * v1.y)
 										 * sqrt(v2.x * v2.x + v2.y * v2.y))) > 0))
 		return w1;
+//	int check_c = 1;
+//	if (is_rhs(w1.x, w1.y, full_wall) == FALSE)
+//	if (cross_product_2d(&w1, &v3) == FALSE)
+//		check_c = -1;
 	//если точка не находится позади одного из векторов, то она точно внутри поля зрения
-	if (-(v1.x * check4.x + v1.y * check4.y) / (sqrt(v1.x * v1.x + v1.y * v1.y)
-											  * sqrt(check4.x * check4.x + check4.y * check4.y)) < 0) {
+	if (-(v1.x * check4.x + v1.y * check4.y) / (sqrt(v1.x * v1.x + v1.y * v1.y)//!!!!!! вектор кросс-продакт?
+											  * sqrt(check4.x * check4.x + check4.y * check4.y)) > 0)
+//	if (-(v3.x * check.x + v3.y * check.y) / (sqrt(v3.x * v3.x + v3.y * v3.y)//!!!!!! вектор кросс-продакт?
+//											  * sqrt(check.x * check.x + check.y * check4.y)) < 0)
+	{
 		//точка слева от направления взгляда игрока
-		res = (find_new_dot(draw, full_wall, draw->m->player->angle - DEGREES_45));//-
+		res = (find_new_dot(draw, full_wall, draw->m->player->angle + DEGREES_45));//-
 	} else {
-		res = (find_new_dot(draw, full_wall, draw->m->player->angle + DEGREES_45));
+		res = (find_new_dot(draw, full_wall, draw->m->player->angle - DEGREES_45));
 	}
 	return (res);
 }
@@ -117,18 +127,18 @@ void	draw_wall(wall *w_origin, sdl_win *win, data *draw) {
 	wall w3;
 	wall w4;
 
-	w->right = w_origin->right;
-	w->left = w_origin->left;
-	w->right = change_dot(draw, w->right, w);
-	w->left = change_dot(draw, w->left, w);
+//	w->right = w_origin->right;
+//	w->left = w_origin->left;
+	w->right = change_dot(draw, w_origin->right, w_origin->left, w_origin);
+	w->left = change_dot(draw, w_origin->left, w_origin->right, w_origin);
 //	w->right = change_dot(draw, w->right, w);
 	if (w->left.x < 0 || w->right.x < 0)
 		return ;
-	float w_h = 10 / sqrt(pow(w->left.x - draw->m->player->x, 2) + pow(draw->m->player->y - w->left.y, 2)) * ((SCREEN_WIDTH / 2) / TANGENT_45);
+	float w_h = 20 / sqrt(pow(w->left.x - draw->m->player->x, 2) + pow(draw->m->player->y - w->left.y, 2)) * ((SCREEN_WIDTH / 2) / TANGENT_45);
 	w1.left.y = SCREEN_HEIGHT / 2 - w_h;
 	w1.right.y = SCREEN_HEIGHT / 2 + w_h;
 
-	w1.left.x = (float)(SCREEN_WIDTH) * (find_angle(draw, w->left));
+	w1.left.x = (SCREEN_WIDTH * ((find_angle(draw, w->left))));
 //	w1.left.x = w1.left.x < 0 ? 0 : w1.left.x;//если стена находится за левым лучом FOV,
 	//то она будет за левой частью экрана - пока присвоим ей 0; если стена находится за
 	//правым лучом FOV, функция find_angle вернёт 1 - умножаем 1 на SCREEN_WIDTH и получаем
@@ -136,11 +146,11 @@ void	draw_wall(wall *w_origin, sdl_win *win, data *draw) {
 	w1.right.x = w1.left.x;
 
 	//длина стены: каноническая длина стены от сектора (в данном случае 10) / расстояние до вершины стены / ((кол-во пикселей экрана по х / 2) / тангенс половины угла обзора игрока (45 градусов)
-	w_h = 10 / sqrt(pow(w->right.x - draw->m->player->x, 2) + pow(draw->m->player->y - w->right.y, 2)) * ((SCREEN_WIDTH / 2) / TANGENT_45);
+	w_h = 20 / sqrt(pow(w->right.x - draw->m->player->x, 2) + pow(draw->m->player->y - w->right.y, 2)) * ((SCREEN_WIDTH / 2) / TANGENT_45);
 	w2.left.y = SCREEN_HEIGHT / 2 - w_h;
 	w2.right.y = SCREEN_HEIGHT / 2 + w_h;
 
-	w2.left.x = (float)(SCREEN_WIDTH) * (find_angle(draw, w->right));
+	w2.left.x = ((SCREEN_WIDTH) * (int)(find_angle(draw, w->right) * 500)) / 500;
 	w2.right.x = w2.left.x;
 	w3.left = w1.left;
 	w3.right = w2.left;

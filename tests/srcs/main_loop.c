@@ -78,7 +78,7 @@ void	clear_bitmap(sdl_win *win, data *draw) {
 
 	w6.right.x = draw->m->player->x;
 	w6.right.y = draw->m->player->y;
-	draw_line(&w6, win->bmap, 0x00FFFF00);
+//	draw_line(&w6, win->bmap, 0x00FFFF00);
 //red vectors are FOV
 	w6.left.x = draw->m->player->x + 30 * sin(draw->m->player->angle + DEGREES_45);
 	w6.left.y = draw->m->player->y - 30 * cos(draw->m->player->angle + DEGREES_45);
