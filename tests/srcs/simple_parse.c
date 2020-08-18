@@ -7,6 +7,7 @@ wall	*create_new_wall(char *str, wall *w) {
 
 //	w = malloc(sizeof(wall));
 	w->left.x = -1;
+	w->height = 20;
 	while (*str && (*str == 'w' || *str == 'a' || *str == 'l'))
 		str++;
 	while (*str && *str != '}') {

@@ -11,7 +11,8 @@ void	error(char *error, int ex) {
 }
 
 void *safe_call(void *res, void *expression, char *error_message) {
-	static int error_count = 1;
+	static int error_count = 1;//номер ошибки
+
 	if (expression == NULL && res == 0) {
 		error_count++;
 		return res;

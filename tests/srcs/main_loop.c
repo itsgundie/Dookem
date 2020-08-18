@@ -28,10 +28,10 @@ void	draw_fov(sdl_win *win, data *draw) {
 	w.left.x = cos(draw->m->player->angle) * 15 + draw->m->player->x;
 	w.left.y = sin(draw->m->player->angle) * 15 + draw->m->player->y;
 	draw_line(&w, win->bmap, 0xFFFFFF00);
-
-	w.left.x = -sin(draw->m->player->angle) * 30 + draw->m->player->x;
-	w.left.y = cos(draw->m->player->angle) * 30 + draw->m->player->y;
-	draw_line(&w, win->bmap, 0xFF00FF00);
+//
+//	w.left.x = -sin(draw->m->player->angle) * 30 + draw->m->player->x;
+//	w.left.y = cos(draw->m->player->angle) * 30 + draw->m->player->y;
+//	draw_line(&w, win->bmap, 0xFF00FF00);
 }
 
 void	clear_bitmap(sdl_win *win, data *draw) {
@@ -71,7 +71,6 @@ void	clear_bitmap(sdl_win *win, data *draw) {
 		draw_player(win, draw);
 		draw_fov(win, draw);
 	}
-
 }
 
 void	put_bitmap(sdl_win *win) {

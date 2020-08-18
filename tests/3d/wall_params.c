@@ -1,18 +1,27 @@
 //
-// Created by Hugor Chau on 7/28/20.
+// Created by Hugor Chau on 8/18/20.
 //
 
 #include "../incs/test.h"
 
-void	draw_line(wall *w, unsigned char **pix_array, int color) {
+float 	wall_h(vertex point, float width, t_player *player) {
+	return width / sqrt(pow(point.x - player->x, 2) + pow(player->y - point.y, 2)) * ((SCREEN_WIDTH / 2) / TANGENT_45);
+}
+
+float 	next_y(wall *w, int is_new_wall) {
 	int		x0 = w->left.x;
 	int		x1 = w->right.x;
 	int		y0 = w->left.y;
 	int		y1 = w->right.y;
+	static int error = 0;
+	vertex  res = w->right;
 
+	if (is_new_wall == TRUE) {
+		error = 0;
+		return 0.0;
+	}
 	int deltax = abs(x1 - x0);
 	int deltay = abs(y1 - y0);
-	int error = 0;
 	int deltaerr = (deltay + 1);
 	int y = y0;
 	int x = x0;
@@ -24,12 +33,13 @@ void	draw_line(wall *w, unsigned char **pix_array, int color) {
 	int dirx = x0 < x1 ? 1 : -1;
 	if (abs(x1 - x0) > abs(y1 - y0)) {
 		while (x != x1) {
-			if (x >= 0 && y >= 0 && x < SCREEN_WIDTH && y < SCREEN_HEIGHT)
-			((int *)(*pix_array))[((x) + y * SCREEN_WIDTH) - 0] = color;
 			error = error + deltaerr;
 			if (error >= (deltax + 1)) {
 				y = y + diry;
 				error = error - (deltax + 1);
+			}
+			if (x >= 0 && y >= 0 && x < SCREEN_WIDTH && y < SCREEN_HEIGHT) {
+				return y;
 			}
 			x += dirx;
 		}
@@ -43,14 +53,18 @@ void	draw_line(wall *w, unsigned char **pix_array, int color) {
 			dirx = -1;
 		int deltaerr = (deltax + 1);
 		while (y != y1) {
-			if (x >= 0 && y >= 0 && x < SCREEN_WIDTH && y < SCREEN_HEIGHT)
-				((int *)(*pix_array))[((x) + y * SCREEN_WIDTH) - 0] = color;
 			error = error + deltaerr;
-			if (error >= (deltay + 1)) {
+			if (error >= (deltay + 1))
+			{
 				x = x + dirx;
 				error = error - (deltay + 1);
+			}
+			else if (x >= 0 && y >= 0 && x < SCREEN_WIDTH && y < SCREEN_HEIGHT)
+			{
+				return y;
 			}
 			y += diry;
 		}
 	}
+	return 0.0;
 }

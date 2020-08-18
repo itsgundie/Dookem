@@ -23,8 +23,8 @@
 
 #define ERROR			"\033[38;2;200;0;30m"
 #define EOC				"\033[38;2;0m"
-#define SCREEN_WIDTH	640
-#define SCREEN_HEIGHT	540
+#define SCREEN_WIDTH	600
+#define SCREEN_HEIGHT	500
 #define TRUE			1
 #define FALSE			0
 #define NOT_NULL		(void *)(size_t)1
@@ -38,19 +38,24 @@
 
 struct		s_data;
 
+typedef struct s_textures{
+	unsigned char	*pixels;
+	int				width;
+	int 			height;
+}				t_textures;
+
 typedef struct		s_sdl_win {
-//
+
 	SDL_Window		*window;
 	SDL_Renderer	*render;
 
-//
 	SDL_Texture		*texture;
 	SDL_Rect		*rect;
 	unsigned char	**bmap;
-//	unsigned char	*bitmap;
-	//
+
+	t_textures		*wall_img[1];
 	SDL_Surface		*surface;
-	void	(*update_texture)(struct s_sdl_win *win, struct s_data *draw);
+	void			(*update_texture)(struct s_sdl_win *win, struct s_data *draw);
 }					sdl_win;
 
 typedef struct		s_vertex {
@@ -61,13 +66,14 @@ typedef struct		s_vertex {
 typedef struct		s_wall {
 	vertex			left;
 	vertex			right;
+	int				height;
 	int				is_portal;
+	int 			texture_num;
 }					wall;
 
 typedef struct		s_player {
 	float			x;
 	float			y;
-//	int				in_sector;
 	float			angle;//direction
 	wall			seeing_walls;//?
 	int				inside;
@@ -89,6 +95,10 @@ typedef struct		s_test {
 	void			(*f)(struct s_test);
 }					test;
 
+typedef struct s_borders {
+
+}				t_borders;
+
 void	init_window(sdl_win *init, char *name);
 void	update_texture(sdl_win *win, data *draw);
 void	error(char *error, int ex);
@@ -107,9 +117,17 @@ void	check();
 void	update_3D_image(sdl_win *win, data *draw);
 //void	update_texture(sdl_win *win, data *draw);
 void	put_bitmap(sdl_win *win);
-void	adapt_bisquit_code(wall *w, data *draw, sdl_win *win);
 vertex	find_new_dot(data *draw, wall *w, float angle);
 int		is_rhs(float x, float y, wall *wal);
+int		possible_vision(wall *w, t_player *p);
+void	draw_wall(wall *w_origin, sdl_win *win, data *draw);
+void	draw_texture(wall *w_origin, sdl_win *win, data *draw);
+float	find_destination(wall *w1, t_player *p);
+vertex	change_dot(data *draw, vertex w1, wall *full_wall);
+float 	wall_h(vertex point, float width, t_player *player);
+float	next_y(wall *w, int is_new_wall);
+void	draw_text(wall borders, float text_x, sdl_win *win);
+
 #include "3d.h"
 
 #endif //TESTS_TEST_H

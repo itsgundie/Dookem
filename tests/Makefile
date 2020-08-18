@@ -31,7 +31,6 @@ C_FILES = main.c \
 		 init_window.c \
 		 main_loop.c \
 		 error.c \
-		 safe_call.c \
 		 simple_parse.c \
 		 dda.c \
 		 add_walls.c \
@@ -41,7 +40,10 @@ C_FILES = main.c \
 		 possible_vision.c
 
 C_FILES_3D = 	init_3d.c \
-                update_image2.c
+                update_image.c \
+                draw_wall.c \
+                textures.c \
+                wall_params.c
 
 OBJ_FILES = $(C_FILES:.c=.o)
 OBJ_FILES_3D = $(C_FILES_3D:.c=.o)
