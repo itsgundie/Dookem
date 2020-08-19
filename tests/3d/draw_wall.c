@@ -95,38 +95,49 @@ void	draw_wall(wall *w_origin, sdl_win *win, data *draw) {
 
 	//длина стены: каноническая длина стены от сектора (в данном случае 10) / расстояние до вершины стены / ((кол-во пикселей экрана по х / 2) / тангенс половины угла обзора игрока (45 градусов)
 	w_h = wall_h(w.right, 40, draw->m->player);
-	w2.left.y = (float)SCREEN_HEIGHT / 2 - w_h;
-	w2.right.y = (float)SCREEN_HEIGHT / 2 + w_h;
+	w2.left.y = ((float)SCREEN_HEIGHT / 2 - w_h);
+	w2.right.y = ((float)SCREEN_HEIGHT / 2 + w_h);
 	w2.left.x = (float)SCREEN_WIDTH * find_angle(draw, w.right);
 	w2.right.x = w2.left.x;
 	w3.left = w1.left;
 	w3.right = w2.left;
 	w4.left = w1.right;
 	w4.right = w2.right;
-	//	if (find_destination(&w, draw->m->player) < 30) {
+//		if (find_destination(&w, draw->m->player) < 50) {
 	wall 	borders;
-	float	t_start_x = (fabs(win->wall_img[0]->width / (w_origin->left.x - w_origin->right.x)) * fabs(w_origin->left.x - w.left.x));
 	float	end_x = (float)SCREEN_WIDTH * find_angle(draw, w.right);
-//	float	step_x =  (float)(win->wall_img[0]->width) / fabs(w_origin->left.x - w_origin->right.x);
-	float	step_x =  (float)(win->wall_img[0]->width) / fabs((float)SCREEN_WIDTH * find_angle(draw, w.left) - (float)SCREEN_WIDTH * find_angle(draw, w.right));
-
+//	float	step_x =  ((float)(win->wall_img[0]->width) / fabs((float)SCREEN_WIDTH * find_angle(draw, w.left) - (float)SCREEN_WIDTH * find_angle(draw, w.right)));// / cos(DEGREES_45);
+//	float	step_x =  ((float)(win->wall_img[0]->width) * find_angle(draw, w.left) - (float)(win->wall_img[0]->width) * find_angle(draw, w.right)) / win->wall_img[0]->width;// / cos(DEGREES_45);
+//	float	t_start_x = (fabs(w_origin->left.x - w.left.x)) * step_x;
+//	float	t_start_x = 1;// (1 - find_angle(draw, w.left)) * (float)(win->wall_img[0]->width) * find_angle(draw, w.left);// (1 − 𝛼)𝑢0 + 𝛼𝑢1
+	float t_start_x = ((float)(win->wall_img[0]->width) / vector_leigh(w_origin) *
+				 (sqrt(pow(w_origin->left.x - w.left.x, 2) + pow(w_origin->left.y - w.left.y, 2))));//find_start();
+	float t_end_x = ((float)(win->wall_img[0]->width) / vector_leigh(w_origin) * (vector_leigh(w_origin) -
+																				  sqrt(pow(w_origin->right.x - w.right.x, 2) + pow(w_origin->right.y - w.right.y, 2))));
 	borders.left.x = (float)SCREEN_WIDTH * find_angle(draw, w.left);
-	w_h = wall_h(w.left, 40, draw->m->player);
-	float step_y =  (((wall_h(w.left, 40, draw->m->player) - wall_h(w.right, 40, draw->m->player)))) / fabs(borders.left.x - end_x + 0.001);
+	w_h = wall_h(w.left, 40, draw->m->player);// / cos(DEGREES_45);
+	float step_y = (((wall_h(w.left, 40, draw->m->player) /*/ cos(DEGREES_45)*/ - wall_h(w.right, 40, draw->m->player)/* / cos(DEGREES_45)*/))) / fabs(borders.left.x - end_x + 0.001);
 	if (borders.left.x > (float)SCREEN_WIDTH * find_angle(draw, w.right)) {
 		end_x = borders.left.x;
 		borders.left.x = (float)SCREEN_WIDTH * find_angle(draw, w.right);
-		w_h = wall_h(w.right, 40, draw->m->player);
+		w_h = wall_h(w.right, 40, draw->m->player);// / cos(DEGREES_45);
 		step_y *= -1;
+		float box = t_start_x;
+		t_start_x = t_end_x;
+		t_end_x = box;
+//		t_start_x = (fabs(w_origin->right.x - w.right.x)) * step_x;
 	}
 	borders.right.x = borders.left.x;
 	borders.left.y = (float)SCREEN_HEIGHT / 2 - w_h;
 	borders.right.y = (float)SCREEN_HEIGHT / 2 + w_h;
 
+	float step_x = (t_end_x - t_start_x) / fabs((float)SCREEN_WIDTH * find_angle(draw, w.left) - (float)SCREEN_WIDTH * find_angle(draw, w.right));
+
+//	printf("tx = %f\n", t_start_x);
 //	step_y *= (wall_h(w.left, 40, draw->m->player)
 	while (borders.left.x < end_x) {
-//			if (borders.left.x > 0 && borders.left.x < SCREEN_WIDTH)
-		draw_text(borders, t_start_x, win);
+		if (borders.left.x > 0 && borders.left.x < SCREEN_WIDTH)
+			draw_text(borders, t_start_x, win);
 		t_start_x += step_x;
 		borders.left.x = (int)borders.left.x + 1;
 		borders.right.x = borders.left.x;
@@ -135,8 +146,8 @@ void	draw_wall(wall *w_origin, sdl_win *win, data *draw) {
 //			//1) найти текущий step_y
 //			//2) найти новые крайние экранные игрики (брезенхайм в помощь)
 ////			draw_texture(w_origin);//передать текущие экранные x, y
-//		}
-	}
+		}
+//	}
 	draw_line(&w1, win->bmap, 0x00FF00FF);
 	draw_line(&w2, win->bmap, 0x00FF00FF);
 	draw_line(&w3, win->bmap, 0x00FF00FF);

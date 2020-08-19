@@ -7,3 +7,5 @@ RED clip 1 wall
 RED make triangle
 RED rewrite code to new structs
 RED write arcitecture's prototipe
+RED rewrite textures
+RED REFACTOR!!!!!

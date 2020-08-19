@@ -19,9 +19,6 @@ void	update_3D_image(sdl_win *win, data *draw) {
 	clear_all(win);
 	while (count > 0) {
 		if (possible_vision(w, draw->m->player)) {
-//			if (find_destination(w, draw->m->player) < 30)
-//				draw_wall(w, win, draw);
-//			else
 				draw_wall(w, win, draw);
 		}
 		w++;

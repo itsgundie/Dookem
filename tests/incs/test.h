@@ -54,7 +54,7 @@ typedef struct		s_sdl_win {
 	unsigned char	**bmap;
 
 	t_textures		*wall_img[1];
-	SDL_Surface		*surface;
+//	SDL_Surface		*surface;
 	void			(*update_texture)(struct s_sdl_win *win, struct s_data *draw);
 }					sdl_win;
 
@@ -98,36 +98,67 @@ typedef struct		s_test {
 typedef struct s_borders {
 
 }				t_borders;
-
+/*
+**		init
+*/
 void	init_window(sdl_win *init, char *name);
-void	update_texture(sdl_win *win, data *draw);
-void	error(char *error, int ex);
-void	*safe_call(void *res, void *expression, char *error_message);
-map		*simple_parse(char *map);
-void	draw_line(wall *w, unsigned char **pix_array, int color);
+/*
+**		2D
+*/
 void	main_loop(sdl_win *win, sdl_win *win3d, data *draw);
-void	add_walls(data	draw);
-void	mouse_events(SDL_Event event, data *draw, int *is_pressed);
-void	key_event(SDL_Event *event, data *draw);
 int 	inside (long x, long y, data *draw);
 int 	inside_vp(float x, float y, data *draw);
-//int		possible_vision(wall *w, t_player *p, vertex *depth);
 void	get_walls_in_front(data *draw, wall **w, int *w_count);
-void	check();
+void	draw_line(wall *w, unsigned char **pix_array, int color);
+void	update_texture(sdl_win *win, data *draw);
+
+/*
+**		3D
+*/
 void	update_3D_image(sdl_win *win, data *draw);
-//void	update_texture(sdl_win *win, data *draw);
-void	put_bitmap(sdl_win *win);
-vertex	find_new_dot(data *draw, wall *w, float angle);
-int		is_rhs(float x, float y, wall *wal);
-int		possible_vision(wall *w, t_player *p);
 void	draw_wall(wall *w_origin, sdl_win *win, data *draw);
 void	draw_texture(wall *w_origin, sdl_win *win, data *draw);
-float	find_destination(wall *w1, t_player *p);
-vertex	change_dot(data *draw, vertex w1, wall *full_wall);
 float 	wall_h(vertex point, float width, t_player *player);
-float	next_y(wall *w, int is_new_wall);
 void	draw_text(wall borders, float text_x, sdl_win *win);
+void	draw_line(wall *w, unsigned char **pix_array, int color);
+void	update_texture(sdl_win *win, data *draw);
 
+/*
+**		wall clipping
+*/
+vertex	find_new_dot(data *draw, wall *w, float angle);
+int		is_rhs(float x, float y, wall *wal);
+float	next_y(wall *w, int is_new_wall);
+vertex	change_dot(data *draw, vertex w1, wall *full_wall);
+
+/*
+**		wall sort
+*/
+float	find_destination(wall *w1, t_player *p);
+int		possible_vision(wall *w, t_player *p);
+/*
+**		tools
+*/
+void	error(char *error, int ex);
+void	*safe_call(void *res, void *expression, char *error_message);
+void	put_bitmap(sdl_win *win);
+
+/*
+**		parsing
+*/
+map		*simple_parse(char *map);
+void	add_walls(data	draw);
+
+/*
+**		SDL events
+*/
+void	mouse_events(SDL_Event event, data *draw, int *is_pressed);
+void	key_event(SDL_Event *event, data *draw);
+
+//int		possible_vision(wall *w, t_player *p, vertex *depth);
+void	check();
+//void	update_texture(sdl_win *win, data *draw);
+float	vector_leigh(wall *w);
 #include "3d.h"
 
 #endif //TESTS_TEST_H
