@@ -122,6 +122,7 @@ float 	wall_h(vertex point, float width, t_player *player);
 void	draw_text(wall borders, float text_x, sdl_win *win);
 void	draw_line(wall *w, unsigned char **pix_array, int color);
 void	update_texture(sdl_win *win, data *draw);
+void	wall_delineation(wall *w_origin, sdl_win *win, data *draw);
 
 /*
 **		wall clipping
@@ -130,6 +131,8 @@ vertex	find_new_dot(data *draw, wall *w, float angle);
 int		is_rhs(float x, float y, wall *wal);
 float	next_y(wall *w, int is_new_wall);
 vertex	change_dot(data *draw, vertex w1, wall *full_wall);
+float	find_angle(data *draw, vertex w1);
+int	is_overlap(data *draw, vertex w1, float angle);
 
 /*
 **		wall sort

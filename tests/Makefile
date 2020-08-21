@@ -43,7 +43,8 @@ C_FILES_3D = 	init_3d.c \
                 update_image.c \
                 draw_wall.c \
                 textures.c \
-                wall_params.c
+                wall_params.c \
+                wall_counturing.c
 
 OBJ_FILES = $(C_FILES:.c=.o)
 OBJ_FILES_3D = $(C_FILES_3D:.c=.o)

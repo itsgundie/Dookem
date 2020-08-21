@@ -4,7 +4,6 @@
 
 #include "../incs/test.h"
 
-
 float	find_angle(data *draw, vertex w1) {
 	vertex v1;
 	v1.x = (draw->m->player->x - w1.x);
@@ -14,6 +13,7 @@ float	find_angle(data *draw, vertex w1) {
 	v2.y = (sin(draw->m->player->angle + DEGREES_45));
 	float res = (-(v1.x * v2.x + v1.y * v2.y) / (sqrt(v1.x * v1.x + v1.y * v1.y)
 												 * sqrt(v2.x * v2.x + v2.y * v2.y))) - 0.2;
+	// 0.2 is magic, don't ask me why
 	return res / cos(res);
 }
 
@@ -75,90 +75,65 @@ vertex	change_dot(data *draw, vertex w1, wall *full_wall) {
 
 void	draw_wall(wall *w_origin, sdl_win *win, data *draw) {
 	wall w;
-	wall w1;
-	wall w2;
-	wall w3;
-	wall w4;
 
 	w.right = change_dot(draw, w_origin->right, w_origin);
 	w.left = change_dot(draw, w_origin->left, w_origin);
 	if (w.left.x < 0 || w.right.x < 0)
 		return ;
 
-	//1) найти координаты левой точки
-	float w_h = wall_h(w.left, 40, draw->m->player);
-	w1.left.y = (float)SCREEN_HEIGHT / 2 - w_h;
-	w1.right.y = (float)SCREEN_HEIGHT / 2 + w_h;
-
-	w1.left.x = (float)SCREEN_WIDTH * find_angle(draw, w.left);
-	w1.right.x = w1.left.x;
-
-	//длина стены: каноническая длина стены от сектора (в данном случае 10) / расстояние до вершины стены / ((кол-во пикселей экрана по х / 2) / тангенс половины угла обзора игрока (45 градусов)
-	w_h = wall_h(w.right, 40, draw->m->player);
-	w2.left.y = ((float)SCREEN_HEIGHT / 2 - w_h);
-	w2.right.y = ((float)SCREEN_HEIGHT / 2 + w_h);
-	w2.left.x = (float)SCREEN_WIDTH * find_angle(draw, w.right);
-	w2.right.x = w2.left.x;
-	w3.left = w1.left;
-	w3.right = w2.left;
-	w4.left = w1.right;
-	w4.right = w2.right;
+	float	w_h;
 	wall 	borders;
 	float	end_x = (float)SCREEN_WIDTH * find_angle(draw, w.right);
-	float t_start_x = ((float)(win->wall_img[0]->width) / vector_leigh(w_origin) *
-				 (sqrt(pow(w_origin->left.x - w.left.x, 2) + pow(w_origin->left.y - w.left.y, 2))));//find_start();
-	float t_end_x = ((float)(win->wall_img[0]->width) / vector_leigh(w_origin) * (vector_leigh(w_origin) -
-																				  sqrt(pow(w_origin->right.x - w.right.x, 2) + pow(w_origin->right.y - w.right.y, 2))));
-	vertex count;
-	count = w.left;
-	vertex w_step;
-
+	float	t_start_x;
 
 	borders.left.x = (float)SCREEN_WIDTH * find_angle(draw, w.left);
 
 	w_h = wall_h(w.left, 40, draw->m->player);// / cos(DEGREES_45);
 	float step_y = (((wall_h(w.left, 40, draw->m->player) /*/ cos(DEGREES_45)*/ - wall_h(w.right, 40, draw->m->player)/* / cos(DEGREES_45)*/))) / fabs(borders.left.x - end_x + 0.001);
 
-	w_step.x = (w.right.x - w.left.x) / fabs(end_x - borders.left.x);
-	w_step.y = (w.right.y - w.left.y) / fabs(end_x - borders.left.x);
+	//нужно ли учитывать дальность?
+	float rrr = sqrt(pow(w_origin->left.x - w_origin->right.x, 2) + pow(w_origin->left.y - w_origin->right.y, 2));
+
+	float common_start_x = ((float)(win->wall_img[0]->width) / rrr * (sqrt(pow(w_origin->left.x - w.left.x, 2) + pow(w_origin->left.y - w.left.y, 2))));
+	t_start_x = common_start_x;
+	float t_end_x = ((float)(win->wall_img[0]->width) / rrr * (sqrt(pow(w_origin->left.x - w.right.x, 2) + pow(w_origin->left.y - w.right.y, 2))));
+	printf("start = %f, end = %f, angle = %f\n", common_start_x, t_end_x, (fabs(common_start_x - t_end_x) / (float)(win->wall_img[0]->width)));
+//	borders.left.x = borders.left.x < 0 ? borders.left.x = 0 : borders.left.x;
+//	end_x = end_x < 0 ? end_x = 0 : end_x;
+//	end_x < 0 ?
+	float step = fabs(t_end_x - common_start_x) / fabs((int)(borders.left.x) - (int)(end_x));
+	float count = t_start_x;
 
 	if (borders.left.x > (float)SCREEN_WIDTH * find_angle(draw, w.right)) {
 		end_x = borders.left.x;
 		borders.left.x = (float)SCREEN_WIDTH * find_angle(draw, w.right);
-		w_h = wall_h(w.right, 40, draw->m->player);// / cos(DEGREES_45);
+		w_h = wall_h(w.right, 40, draw->m->player);
 		step_y *= -1;
-		w_step.x = (-w.right.x + w.left.x) / fabs(end_x - borders.left.x);
-		w_step.y = (-w.right.y + w.left.y) / fabs(end_x - borders.left.x);
-		count = w.right;
-		float box = t_start_x;
-		t_start_x = t_end_x;
-		t_end_x = box;
+		step *= -1;
+		count = t_end_x;
 	}
-	borders.right.x = borders.left.x;
 	borders.left.y = (float)SCREEN_HEIGHT / 2 - w_h;
 	borders.right.y = (float)SCREEN_HEIGHT / 2 + w_h;
 
-
-	float step_x = (t_end_x - t_start_x) / fabs((float)SCREEN_WIDTH * find_angle(draw, w.left) - (float)SCREEN_WIDTH * find_angle(draw, w.right));
-	printf("steps = x: %f, y: %f\n", w_step.x, w_step.y);
-
+	float end_dist = sqrt(pow(w_origin->right.x - draw->m->player->x, 2) + pow(draw->m->player->y - w_origin->right.y, 2));
+	float start_dist = sqrt(pow(w_origin->left.x - draw->m->player->x, 2) + pow(draw->m->player->y - w_origin->left.y, 2));
+	float angle;
+//	borders.left.x = borders.left.x < 0 ? borders.left.x = 0 : borders.left.x;
+//	end_x = end_x < 0 ? 0 : end_x;
 	while (borders.left.x < end_x) {
-		//			//1) найти текущий step_y
-//			//2) найти новые крайние экранные игрики (брезенхайм в помощь)
-////			draw_texture(w_origin);//передать текущие экранные x, y
-		if (borders.left.x > 0 && borders.left.x < SCREEN_WIDTH)
-			draw_text(borders, t_start_x, win);
-		count.x += w_step.x;
-		count.y += w_step.y;
-		t_start_x = ((float)(win->wall_img[0]->width) / vector_leigh(w_origin) *
-					 (sqrt(pow(w_origin->left.x - count.x, 2) + pow(w_origin->left.y - count.y, 2))));
-		borders.left.x = (int)borders.left.x + 1;
 		borders.right.x = borders.left.x;
+		if (borders.left.x >= 0 && borders.left.x < SCREEN_WIDTH) {
+			angle = (fabs(/*common_start_x - */count) / (float)(win->wall_img[0]->width));
+
+			t_start_x = ((common_start_x * ((1.0 - angle) / start_dist)) +
+						 (t_end_x * ((angle) / end_dist)))/ //;// /
+						((1.0 - angle) * (1 / start_dist) + (angle) * (1 / end_dist));
+			draw_text(borders, t_start_x, win);
+		}
+		count += step;
+		borders.left.x = (int)borders.left.x + 1;
 		borders.left.y += step_y * 1;
 		borders.right.y -= step_y * 1;
-		}
-	draw_line(&w1, win->bmap, 0x00FF00FF);
-	draw_line(&w2, win->bmap, 0x00FF00FF);
-	draw_line(&w3, win->bmap, 0x00FF00FF);
-	draw_line(&w4, win->bmap, 0x00FF00FF);
+	}
+	wall_delineation(w_origin, win, draw);
 }
