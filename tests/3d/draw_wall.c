@@ -24,7 +24,7 @@ vertex	find_new_dot(data *draw, wall *w, float angle) {
 	vertex v2 = w->left.x <= w->right.x ? w->right : w->left;
 
 	if (fabs(sin(angle)) <= 0.00001 || fabs(cos(angle)) <= 0.00001)
-		angle += 0.001;
+		angle += 0.00001;
 	float px1 = cos(angle) > 0 ? draw->m->player->x : draw->m->player->x + cos(angle);
 	float py1 = cos(angle) > 0 ? draw->m->player->y : draw->m->player->y + sin(angle);
 
@@ -57,19 +57,16 @@ int	is_overlap(data *draw, vertex w1, float angle) {
 }
 
 vertex	change_dot(data *draw, vertex w1, wall *full_wall) {
-	vertex v1;
-	v1.x = (draw->m->player->x - w1.x);
-	v1.y = (draw->m->player->y - w1.y);
 	vertex res = w1;
 	if (is_overlap(draw, w1, draw->m->player->angle) == TRUE)
 	{
 		res = (find_new_dot(draw, full_wall, draw->m->player->angle + DEGREES_45 * 2));
-		v1.x = (draw->m->player->x - res.x); v1.y = draw->m->player->y - res.y;
+//		v1.x = (draw->m->player->x - res.x); v1.y = draw->m->player->y - res.y;
 	}
+	if (is_overlap(draw, res, draw->m->player->angle + DEGREES_45) == TRUE)
+		res = (find_new_dot(draw, full_wall, draw->m->player->angle - DEGREES_45/*что-то с обрезанием*/));
 	if (is_overlap(draw, res, draw->m->player->angle - DEGREES_45) == TRUE)
 		res = (find_new_dot(draw, full_wall, draw->m->player->angle + DEGREES_45));
-	else if (is_overlap(draw, res, draw->m->player->angle + DEGREES_45) == TRUE)
-		res = (find_new_dot(draw, full_wall, draw->m->player->angle - DEGREES_45));
 	return (res);
 }
 
@@ -98,10 +95,7 @@ void	draw_wall(wall *w_origin, sdl_win *win, data *draw) {
 	t_start_x = common_start_x;
 	float t_end_x = ((float)(win->wall_img[0]->width) / rrr * (sqrt(pow(w_origin->left.x - w.right.x, 2) + pow(w_origin->left.y - w.right.y, 2))));
 	printf("start = %f, end = %f, angle = %f\n", common_start_x, t_end_x, (fabs(common_start_x - t_end_x) / (float)(win->wall_img[0]->width)));
-//	borders.left.x = borders.left.x < 0 ? borders.left.x = 0 : borders.left.x;
-//	end_x = end_x < 0 ? end_x = 0 : end_x;
-//	end_x < 0 ?
-	float step = fabs(t_end_x - common_start_x) / fabs((int)(borders.left.x) - (int)(end_x));
+	float step = fabs(t_end_x - common_start_x) / fabs((borders.left.x) - (end_x));
 	float count = t_start_x;
 
 	if (borders.left.x > (float)SCREEN_WIDTH * find_angle(draw, w.right)) {
@@ -115,19 +109,18 @@ void	draw_wall(wall *w_origin, sdl_win *win, data *draw) {
 	borders.left.y = (float)SCREEN_HEIGHT / 2 - w_h;
 	borders.right.y = (float)SCREEN_HEIGHT / 2 + w_h;
 
-	float end_dist = sqrt(pow(w_origin->right.x - draw->m->player->x, 2) + pow(draw->m->player->y - w_origin->right.y, 2));
-	float start_dist = sqrt(pow(w_origin->left.x - draw->m->player->x, 2) + pow(draw->m->player->y - w_origin->left.y, 2));
+	float end_dist = sqrt(pow(w.right.x - draw->m->player->x, 2) + pow(draw->m->player->y - w.right.y, 2));
+	float start_dist = sqrt(pow(w.left.x - draw->m->player->x, 2) + pow(draw->m->player->y - w.left.y, 2));
 	float angle;
-//	borders.left.x = borders.left.x < 0 ? borders.left.x = 0 : borders.left.x;
-//	end_x = end_x < 0 ? 0 : end_x;
+
 	while (borders.left.x < end_x) {
 		borders.right.x = borders.left.x;
 		if (borders.left.x >= 0 && borders.left.x < SCREEN_WIDTH) {
-			angle = (fabs(/*common_start_x - */count) / (float)(win->wall_img[0]->width));
+			angle = ((count) / (float)(win->wall_img[0]->width));
 
 			t_start_x = ((common_start_x * ((1.0 - angle) / start_dist)) +
-						 (t_end_x * ((angle) / end_dist)))/ //;// /
-						((1.0 - angle) * (1 / start_dist) + (angle) * (1 / end_dist));
+						 (t_end_x * ((angle) / end_dist))) / //;// /
+						((1.0 - angle) * (1.0 / start_dist) + (angle) * (1.0 / end_dist));
 			draw_text(borders, t_start_x, win);
 		}
 		count += step;

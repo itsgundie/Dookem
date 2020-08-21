@@ -5,7 +5,7 @@
 #include "../incs/test.h"
 
 float 	wall_h(vertex point, float width, t_player *player) {
-	return width / sqrt(pow(point.x - player->x, 2) + pow(player->y - point.y, 2)) * ((SCREEN_WIDTH / 2) / TANGENT_45);
+	return width / sqrt(pow(point.x - player->x, 2) + pow(player->y - point.y, 2)) * ((SCREEN_HEIGHT / 2) / TANGENT_45);
 }
 
 float	vector_leigh(wall *w) {
