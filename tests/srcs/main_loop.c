@@ -28,6 +28,8 @@ void	draw_fov(sdl_win *win, data *draw) {
 	w.left.x = cos(draw->m->player->angle) * 15 + draw->m->player->x;
 	w.left.y = sin(draw->m->player->angle) * 15 + draw->m->player->y;
 	draw_line(&w, win->bmap, 0xFFFFFF00);
+
+
 //
 //	w.left.x = -sin(draw->m->player->angle) * 30 + draw->m->player->x;
 //	w.left.y = cos(draw->m->player->angle) * 30 + draw->m->player->y;
@@ -58,19 +60,27 @@ void	clear_bitmap(sdl_win *win, data *draw) {
 		i++;
 	}
 	i = 0;
+	if (draw->m->is_new != TRUE) {
+		draw_player(win, draw);
+		draw_fov(win, draw);
+	}
 	//Here! I'm getting all potential visible walls for current sector
 	get_walls_in_front(draw, &wal, &w_count);
 	while (i < w_count) {
 		if (wal[i].right.x != -1) {
 			draw_line(&wal[i], win->bmap, 0x00000000);
+//			wall check;
+//			{
+//				check.right = change_dot(draw, wal[i].left, &wal[i]);
+//				check.left.x = draw->m->player->x;// = change_dot(draw, w.left, &w);
+//				check.left.y = draw->m->player->y;
+//				draw_line(&check, win->bmap, 0xFFFFFF00);
+//			}
 		}
 		i++;
 	}
 
-	if (draw->m->is_new != TRUE) {
-		draw_player(win, draw);
-		draw_fov(win, draw);
-	}
+
 }
 
 void	put_bitmap(sdl_win *win) {

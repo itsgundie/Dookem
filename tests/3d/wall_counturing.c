@@ -14,7 +14,8 @@ void	wall_delineation(wall *w_origin, sdl_win *win, data *draw) {
 	w.left = change_dot(draw, w_origin->left, w_origin);
 	if (w.left.x < 0 || w.right.x < 0)
 		return;
-
+	if (find_angle(draw, w.right) == -1 || find_angle(draw, w.left) == -1)
+		return;
 	//1) найти координаты левой точки
 	float w_h = wall_h(w.left, 40, draw->m->player);
 	w1.left.y = (float) SCREEN_HEIGHT / 2 - w_h;
