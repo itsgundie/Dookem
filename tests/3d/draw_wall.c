@@ -86,68 +86,66 @@ void	draw_wall(wall *w_origin, sdl_win *win, data *draw) {
 	float	w_h;
 	wall 	borders;
 
-	////экранные границы иксов
+	float angle;
+	//экранные границы иксов
 	float	end_x = (float)SCREEN_WIDTH * find_angle(draw, w.right);
 	borders.left.x = (float)SCREEN_WIDTH * find_angle(draw, w.left);
 
-	////начальная высота стены
+	//начальная высота стены
 	w_h = wall_h(w.left, 40, draw->m->player);
 
-	////шаг по игрекам
-	float step_y = (((wall_h(w.left, 40, draw->m->player) - wall_h(w.right, 40, draw->m->player)))) / fabs(borders.left.x - end_x + 0.0001);
+	//шаг по игрекам
+	float step_y = (wall_h(w.left, 40, draw->m->player) - wall_h(w.right, 40, draw->m->player)) / fabs(borders.left.x - end_x);
 
+	////дистанция до крайних пикселей текстуры?????
+	float end_dist = sqrt(pow(w_origin->right.x - draw->m->player->x, 2) + pow(draw->m->player->y - w_origin->right.y, 2));
+	float start_dist = sqrt(pow(w_origin->left.x - draw->m->player->x, 2) + pow(draw->m->player->y - w_origin->left.y, 2));
 
-
-	////дистанция до крайних пикселей текстуры
-//	float end_dist = sqrt(pow(w_origin->right.x - draw->m->player->x, 2) + pow(draw->m->player->y - w_origin->right.y, 2));
-//	float start_dist = sqrt(pow(w_origin->left.x - draw->m->player->x, 2) + pow(draw->m->player->y - w_origin->left.y, 2));
-	float end_dist = sqrt(pow(w.right.x - draw->m->player->x, 2) + pow(draw->m->player->y - w.right.y, 2));
-	float start_dist = sqrt(pow(w.left.x - draw->m->player->x, 2) + pow(draw->m->player->y - w.left.y, 2));
-
-
-	////общая длина стены
+	//общая длина стены
 	float rrr = sqrt(pow(w_origin->left.x - w_origin->right.x, 2) + pow(w_origin->left.y - w_origin->right.y, 2));
 
-	////крайние пиксели текстуры
-	float common_start_x = ((float)(win->wall_img[0]->width) / rrr * (sqrt(pow(w_origin->left.x - w.left.x, 2) + pow(w_origin->left.y - w.left.y, 2))));
-	float t_end_x = ((float)(win->wall_img[0]->width) / rrr * (sqrt(pow(w_origin->left.x - w.right.x, 2) + pow(w_origin->left.y - w.right.y, 2))));
-//	printf("start = %f, end = %f\n", common_start_x, t_end_x);
-//	float t_end_x = win->wall_img[0]->width / rrr * find_angle(draw, w.right);
-//	float common_start_x = win->wall_img[0]->width / rrr * find_angle(draw, w.left);
-	float step = (t_end_x - common_start_x) / fabs(borders.left.x - end_x);
+	////крайние пиксели текстуры????
+	float common_start_x = (float)win->wall_img[0]->width / rrr * (sqrt(pow(w_origin->left.x - w.left.x, 2) + pow(w_origin->left.y - w.left.y, 2)));
+	float t_end_x = (float)win->wall_img[0]->width / rrr * (sqrt(pow(w_origin->left.x - w.right.x, 2) + pow(w_origin->left.y - w.right.y, 2)));
+
+	////шаг текстуры???
+	float t_step_x = (t_end_x - common_start_x) / (fabs(borders.left.x - end_x));
 	float count = common_start_x;
 
+	printf("%f\n", t_step_x);
 	if (borders.left.x > end_x) {
 		end_x = borders.left.x;
 		borders.left.x = (float)SCREEN_WIDTH * find_angle(draw, w.right);
 		w_h = wall_h(w.right, 40, draw->m->player);
 		step_y *= -1;
-		step *= -1;
+		t_step_x *= -1;
 		count = t_end_x;
-		printf("Change will come\n");
 	}
 	borders.left.y = (float)SCREEN_HEIGHT / 2 - w_h;
 	borders.right.y = (float)SCREEN_HEIGHT / 2 + w_h;
 
-	float angle;
 	float t_start_x;
-	printf("count = %f\n", count);
-	 common_start_x = 1;
-	 t_end_x = (float)(win->wall_img[0]->width);
+	common_start_x = 0;
+	t_end_x = (float)(win->wall_img[0]->width - 1);
+
+	 end_dist = sqrt(pow(w.right.x - draw->m->player->x, 2) + pow(draw->m->player->y - w.right.y, 2));
+	 start_dist = sqrt(pow(w.left.x - draw->m->player->x, 2) + pow(draw->m->player->y - w.left.y, 2));
+
 	while (borders.left.x < end_x)
 	{
 		borders.right.x = borders.left.x;
+		////????
 		angle = ((count) / (float)(win->wall_img[0]->width));
-//		angle = borders.left.x / SCREEN_WIDTH;
-		t_start_x = ((common_start_x * ((1.0 - angle) / start_dist)) +
-						 (t_end_x * ((angle) / end_dist))) /
-						((1.0 - angle) * (1.0 / start_dist) + (angle) * (1.0 / end_dist));
+		//вроде, это верная формула, неверные значения, очевидно
+		t_start_x = ((1.0 - angle) * (common_start_x / start_dist)) +
+						 ((angle) * (t_end_x / end_dist));
+		t_start_x = t_start_x /
+						((1.0 - angle) * (1.0 / start_dist) + (angle * (1.0 / end_dist)));
 		draw_text(borders, t_start_x, win);
-		count += step;
-
+		count += t_step_x;
 		borders.left.x = (int)borders.left.x + 1;
-		borders.left.y += step_y * 1;
-		borders.right.y -= step_y * 1;
+		borders.left.y += step_y;
+		borders.right.y -= step_y;
 	}
 	wall_delineation(w_origin, win, draw);
 }
