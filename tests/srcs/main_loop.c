@@ -29,7 +29,18 @@ void	draw_fov(sdl_win *win, data *draw) {
 	w.left.y = sin(draw->m->player->angle) * 15 + draw->m->player->y;
 	draw_line(&w, win->bmap, 0xFFFFFF00);
 
-
+	w.left.x = draw->m->player->x + 30 * sin(draw->m->player->angle - DEGREES_45 * 3);
+	w.left.y = draw->m->player->y - 30 * cos(draw->m->player->angle - DEGREES_45 * 3);
+	draw_line(&w, win->bmap, 0x00FFFFFF);
+	w.left.x = draw->m->player->x - 30 * sin(draw->m->player->angle + DEGREES_45 * 3);
+	w.left.y = draw->m->player->y + 30 * cos(draw->m->player->angle + DEGREES_45 * 3);
+	draw_line(&w, win->bmap, 0x00FFFFFF);
+//	w.left.x = draw->m->player->x + 30 * sin(draw->m->player->angle + DEGREES_45 * 2);
+//	w.left.y = draw->m->player->y + 30 * cos(draw->m->player->angle + DEGREES_45 * 2);
+//	draw_line(&w, win->bmap, 0x00FFFFFF);
+//	w.left.x = draw->m->player->x - 30 * sin(draw->m->player->angle - DEGREES_45 * 2);
+//	w.left.y = draw->m->player->y + 30 * cos(draw->m->player->angle - DEGREES_45 * 2);
+//	draw_line(&w, win->bmap, 0x00FFFFFF);
 //
 //	w.left.x = -sin(draw->m->player->angle) * 30 + draw->m->player->x;
 //	w.left.y = cos(draw->m->player->angle) * 30 + draw->m->player->y;

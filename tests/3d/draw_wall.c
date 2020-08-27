@@ -59,28 +59,35 @@ int	is_overlap(data *draw, vertex w1, float angle) {
 	return FALSE;
 }
 
-vertex	change_dot(data *draw, vertex w1, wall *full_wall) {
+vertex	change_dot(data *draw, vertex w1, wall *full_wall, int *side) {
 	vertex res = w1;
+	*side = MIDDLE;
 	if (is_overlap(draw, w1, draw->m->player->angle) == TRUE)
 	{
 		res = (find_new_dot(draw, full_wall, draw->m->player->angle + DEGREES_45 * 2));
 	}
 	if (is_overlap(draw, res, draw->m->player->angle + DEGREES_45) == TRUE)
 	{
+		*side = LEFT;
 		res = (find_new_dot(draw, full_wall, draw->m->player->angle - DEGREES_45));
 	}
 	if (is_overlap(draw, res, draw->m->player->angle - DEGREES_45) == TRUE)
 	{
-		res = (find_new_dot(draw, full_wall, draw->m->player->angle +  DEGREES_45));
+		*side = RIGHT;
+		res = (find_new_dot(draw, full_wall, draw->m->player->angle + DEGREES_45));
 	}
 	return (res);
 }
 
 void	draw_wall(wall *w_origin, sdl_win *win, data *draw) {
 	wall w;
+	int side_l;
+	int side_r;
 
-	w.right = change_dot(draw, w_origin->right, w_origin);
-	w.left = change_dot(draw, w_origin->left, w_origin);
+	w.right = change_dot(draw, w_origin->right, w_origin, &side_r);
+	w.left = change_dot(draw, w_origin->left, w_origin, &side_l);
+//	float guess_step = find_step(w_origin->left, draw, side_l);
+
 	if (w.left.x < 0 || w.right.x < 0)
 		return ;
 	float	w_h;
@@ -94,25 +101,31 @@ void	draw_wall(wall *w_origin, sdl_win *win, data *draw) {
 	//начальная высота стены
 	w_h = wall_h(w.left, 40, draw->m->player);
 
+
 	//шаг по игрекам
 	float step_y = (wall_h(w.left, 40, draw->m->player) - wall_h(w.right, 40, draw->m->player)) / fabs(borders.left.x - end_x);
 
 	////дистанция до крайних пикселей текстуры?????
 	float end_dist = sqrt(pow(w_origin->right.x - draw->m->player->x, 2) + pow(draw->m->player->y - w_origin->right.y, 2));
 	float start_dist = sqrt(pow(w_origin->left.x - draw->m->player->x, 2) + pow(draw->m->player->y - w_origin->left.y, 2));
-
 	//общая длина стены
+
 	float rrr = sqrt(pow(w_origin->left.x - w_origin->right.x, 2) + pow(w_origin->left.y - w_origin->right.y, 2));
 
-	////крайние пиксели текстуры????
-	float common_start_x = (float)win->wall_img[0]->width / rrr * (sqrt(pow(w_origin->left.x - w.left.x, 2) + pow(w_origin->left.y - w.left.y, 2)));
-	float t_end_x = (float)win->wall_img[0]->width / rrr * (sqrt(pow(w_origin->left.x - w.right.x, 2) + pow(w_origin->left.y - w.right.y, 2)));
+	////????
+//	float common_start_x = (float)win->wall_img[0]->width / rrr * (sqrt(pow(w_origin->left.x - w.left.x, 2) + pow(w_origin->left.y - w.left.y, 2)));
+//	float t_end_x = (float)win->wall_img[0]->width / rrr * (sqrt(pow(w_origin->left.x - w.right.x, 2) + pow(w_origin->left.y - w.right.y, 2)));
 
 	////шаг текстуры???
-	float t_step_x = (t_end_x - common_start_x) / (fabs(borders.left.x - end_x));
+	float text_1 = find_step(w_origin->left, draw, side_l);//угол нулевого текстеля
+	float text_2 = find_step(w_origin->right, draw, side_r);//угол последнего текстеля
+	float angle_step = (float)win->wall_img[0]->width / ((fabs(text_1) + fabs(text_2) + fabs(find_angle(draw, w.left) - find_angle(draw, w.right)))) /*100%*/;
+
+	float common_start_x = fabs(text_1 * angle_step);// * win->wall_img[0]->width);
+	float t_end_x = win->wall_img[0]->width - fabs(text_2 * angle_step);// win->wall_img[0]->width - fabs(text_2 / (fabs(text_1) + fabs(text_2) + fabs(find_angle(draw, w.left) - find_angle(draw, w.right))) * win->wall_img[0]->width);
+	float t_step_x = (t_end_x - common_start_x) / fabs(borders.left.x - end_x);
 	float count = common_start_x;
 
-	printf("%f\n", t_step_x);
 	if (borders.left.x > end_x) {
 		end_x = borders.left.x;
 		borders.left.x = (float)SCREEN_WIDTH * find_angle(draw, w.right);
@@ -126,17 +139,13 @@ void	draw_wall(wall *w_origin, sdl_win *win, data *draw) {
 
 	float t_start_x;
 	common_start_x = 0;
-	t_end_x = (float)(win->wall_img[0]->width - 1);
-
-	 end_dist = sqrt(pow(w.right.x - draw->m->player->x, 2) + pow(draw->m->player->y - w.right.y, 2));
-	 start_dist = sqrt(pow(w.left.x - draw->m->player->x, 2) + pow(draw->m->player->y - w.left.y, 2));
+	t_end_x = win->wall_img[0]->width;
 
 	while (borders.left.x < end_x)
 	{
 		borders.right.x = borders.left.x;
 		////????
-		angle = ((count) / (float)(win->wall_img[0]->width));
-		//вроде, это верная формула, неверные значения, очевидно
+		angle = ((count)) / win->wall_img[0]->width ;
 		t_start_x = ((1.0 - angle) * (common_start_x / start_dist)) +
 						 ((angle) * (t_end_x / end_dist));
 		t_start_x = t_start_x /

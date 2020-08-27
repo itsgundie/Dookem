@@ -12,63 +12,68 @@ float	vector_leigh(wall *w) {
 	return sqrt(pow(w->left.x - w->right.x, 2) + pow(w->left.y - w->right.y, 2));
 }
 
-float 	next_y(wall *w, int is_new_wall) {
-	int		x0 = w->left.x;
-	int		x1 = w->right.x;
-	int		y0 = w->left.y;
-	int		y1 = w->right.y;
-	static int error = 0;
-	vertex  res = w->right;
+float	find_full_angle(data *draw, vertex w1, float angle) {
+	vertex v1;
+	float res;
+	v1.x = (draw->m->player->x - w1.x);
+	v1.y = (draw->m->player->y - w1.y);
+	vertex v2;
+	v2.x = (cos(draw->m->player->angle + angle));
+	v2.y = (sin(draw->m->player->angle + angle));
+	res = -(((v1.x * v2.x + v1.y * v2.y) / (sqrt(v1.x * v1.x + v1.y * v1.y)
+											* sqrt(v2.x * v2.x + v2.y * v2.y))));
 
-	if (is_new_wall == TRUE) {
-		error = 0;
-		return 0.0;
-	}
-	int deltax = abs(x1 - x0);
-	int deltay = abs(y1 - y0);
-	int deltaerr = (deltay + 1);
-	int y = y0;
-	int x = x0;
-	int diry = y1 - y0;
-	if (diry > 0)
-		diry = 1;
-	if (diry < 0)
-		diry = -1;
-	int dirx = x0 < x1 ? 1 : -1;
-	if (abs(x1 - x0) > abs(y1 - y0)) {
-		while (x != x1) {
-			error = error + deltaerr;
-			if (error >= (deltax + 1)) {
-				y = y + diry;
-				error = error - (deltax + 1);
-			}
-			if (x >= 0 && y >= 0 && x < SCREEN_WIDTH && y < SCREEN_HEIGHT) {
-				return y;
-			}
-			x += dirx;
+	res = res >= 1 ? acos(1) : res <= -1 ? acos(-1) : acos(res);
+	res = (180 / M_PI * res) / 90.0;
+	return res;
+}
+
+float	find_step(vertex check, data *draw, int hit_side) {
+	float hit_angle;
+
+	hit_angle = 0.0;//if side is MIDDLE - there was not hit with FOV-lines
+	if (hit_side == MIDDLE)
+		return hit_angle;
+	if (is_overlap(draw, check, draw->m->player->angle + DEGREES_45) == TRUE &&
+			(is_overlap(draw, check, draw->m->player->angle - DEGREES_45) == TRUE)) {
+		if (is_overlap(draw, check, draw->m->player->angle + DEGREES_45 * 2) == TRUE) {
+			hit_angle = find_full_angle(draw, check, -DEGREES_45);
+//			printf("HERE %f\n", hit_angle);
 		}
+		else {
+			hit_angle = find_full_angle(draw, check, DEGREES_45);
+//			printf("OVER HERE %f\n", hit_angle);
+		}
+//		return hit_angle;
+//		hit_angle += 1.0;
 	}
 	else {
-		int diry = y0 < y1 ? 1 : -1;
-		int dirx = x1 - x0;
-		if (dirx > 0)
-			dirx = 1;
-		if (dirx < 0)
-			dirx = -1;
-		int deltaerr = (deltax + 1);
-		while (y != y1) {
-			error = error + deltaerr;
-			if (error >= (deltay + 1))
-			{
-				x = x + dirx;
-				error = error - (deltay + 1);
-			}
-			else if (x >= 0 && y >= 0 && x < SCREEN_WIDTH && y < SCREEN_HEIGHT)
-			{
-				return y;
-			}
-			y += diry;
+		if (hit_side == LEFT) {
+			//ищу угол по левый луч FOV
+			hit_angle = find_full_angle(draw, check, -DEGREES_45);
+		}
+		if (hit_side == RIGHT) {
+			hit_angle = find_full_angle(draw, check, DEGREES_45);
 		}
 	}
-	return 0.0;
+	hit_angle = hit_side == LEFT ? hit_angle * -1 : hit_angle;
+//	printf("%f\n", hit_angle);
+	return hit_angle;
 }
+
+
+
+
+
+//vertex hit;
+//hit.x = floor(cos(start_dist));
+//hit.y = floor(sin(start_dist));
+//hit.x = cos(start_dist) - hit.x;
+//hit.y = sin(start_dist) - hit.y;
+//common_start_x = hit.x * win->wall_img[0]->width;
+//////крайние пиксели текстуры????
+//hit.x = floor(cos(end_dist));
+//hit.y = floor(sin(end_dist));
+//hit.x = cos(end_dist) - hit.x;
+//hit.y = sin(end_dist) - hit.y;
+//end_dist = hit.x * win->wall_img[0]->width;

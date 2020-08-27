@@ -32,6 +32,8 @@
 #define WIN_3D			"3d test: how to render?"
 #define LEFT			0
 #define RIGHT			1
+#define MIDDLE			2
+#define BACK			3
 #define DEGREES_45		0.785398
 #define TANGENT_45		1.61977519054
 #define TANGENT_90		-1.99520041221
@@ -123,14 +125,14 @@ void	draw_text(wall borders, float text_x, sdl_win *win);
 void	draw_line(wall *w, unsigned char **pix_array, int color);
 void	update_texture(sdl_win *win, data *draw);
 void	wall_delineation(wall *w_origin, sdl_win *win, data *draw);
-
+float	find_step(vertex check, data *draw, int hit_side);
 /*
 **		wall clipping
 */
 vertex	find_new_dot(data *draw, wall *w, float angle);
 int		is_rhs(float x, float y, wall *wal);
 float	next_y(wall *w, int is_new_wall);
-vertex	change_dot(data *draw, vertex w1, wall *full_wall);
+vertex	change_dot(data *draw, vertex w1, wall *full_wall, int *side);
 float	find_angle(data *draw, vertex w1);
 int	is_overlap(data *draw, vertex w1, float angle);
 
