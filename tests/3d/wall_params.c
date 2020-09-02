@@ -61,7 +61,13 @@ float	find_step(vertex check, data *draw, int hit_side) {
 	return hit_angle;
 }
 
-
+float 	find_textel(float angle, vertex textels, vertex dist, int text_max) {
+	float res = ((1.0 - angle) * (textels.x / dist.x)) +
+				((angle) * (textels.y / dist.y));
+	res = (int)(res /
+					  ((1.0 - angle) * (1.0 / dist.x) + (angle * (1.0 / dist.y)))) % text_max;
+	return res;
+}
 
 
 
