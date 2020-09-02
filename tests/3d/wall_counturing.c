@@ -9,10 +9,9 @@ void	wall_delineation(wall *w_origin, sdl_win *win, data *draw) {
 	wall w2;
 	wall w3;
 	wall w4;
-	int i;
 
-	w.right = change_dot(draw, w_origin->right, w_origin, &i);
-	w.left = change_dot(draw, w_origin->left, w_origin, &i);
+	w.right = horizontal_clipping(draw, w_origin->right, w_origin);
+	w.left = horizontal_clipping(draw, w_origin->left, w_origin);
 	if (w.left.x < 0 || w.right.x < 0)
 		return;
 	if (find_angle(draw, w.right) == -1 || find_angle(draw, w.left) == -1)

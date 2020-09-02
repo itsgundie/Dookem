@@ -55,7 +55,7 @@ typedef struct		s_sdl_win {
 	SDL_Rect		*rect;
 	unsigned char	**bmap;
 
-	t_textures		*wall_img[1];
+	t_textures		*wall_img[3];
 //	SDL_Surface		*surface;
 	void			(*update_texture)(struct s_sdl_win *win, struct s_data *draw);
 }					sdl_win;
@@ -97,6 +97,12 @@ typedef struct		s_test {
 	void			(*f)(struct s_test);
 }					test;
 
+typedef struct		s_vertex_x
+{
+	float			start;
+	float			end;
+}					vertex_x;
+
 typedef struct s_borders {
 
 }				t_borders;
@@ -121,20 +127,20 @@ void	update_3D_image(sdl_win *win, data *draw);
 void	draw_wall(wall *w_origin, sdl_win *win, data *draw);
 void	draw_texture(wall *w_origin, sdl_win *win, data *draw);
 float 	wall_h(vertex point, float width, t_player *player);
-void	draw_text(wall borders, float text_x, sdl_win *win);
+void	draw_text(wall borders, float text_x, sdl_win *win, int text_num);
 void	draw_line(wall *w, unsigned char **pix_array, int color);
 void	update_texture(sdl_win *win, data *draw);
+
+/*
+**		checking 3D-boundaries
+*/
 void	wall_delineation(wall *w_origin, sdl_win *win, data *draw);
-float	find_step(vertex check, data *draw, int hit_side);
+
 /*
 **		wall clipping
 */
-vertex	find_new_dot(data *draw, wall *w, float angle);
-int		is_rhs(float x, float y, wall *wal);
-float	next_y(wall *w, int is_new_wall);
-vertex	change_dot(data *draw, vertex w1, wall *full_wall, int *side);
+vertex	horizontal_clipping(data *draw, vertex original_dot, wall *full_wall);
 float	find_angle(data *draw, vertex w1);
-int	is_overlap(data *draw, vertex w1, float angle);
 
 /*
 **		wall sort
