@@ -11,22 +11,24 @@ static vertex	find_new_dot(data *draw, wall *w, float angle) {
 	vertex v1 = w->left.x <= w->right.x ? w->left : w->right;
 	vertex v2 = w->left.x <= w->right.x ? w->right : w->left;
 
-	if (fabs(sin(angle)) <= 0.00001 || fabs(cos(angle)) <= 0.00001)
-		angle += 0.00001;
+	if (fabs(sin(angle)) <= 0.000001 || fabs(cos(angle)) <= 0.000001)
+		angle += 0.0000001;
 	float px1 = cos(angle) > 0 ? draw->m->player->x : draw->m->player->x + cos(angle);
 	float py1 = cos(angle) > 0 ? draw->m->player->y : draw->m->player->y + sin(angle);
 
 	float a1 = tan(angle);
-	float a2 = ((-v2.y + v1.y) / (-v2.x + v1.x));
+	float a2;
+	a2 = ((-v2.y + v1.y) / (-v2.x + v1.x + 0.000001));
 
 	float b1 = (py1 - (a1 * px1));
 	float b2 = (v1.y - a2 * v1.x);
 
 	res.x = ((b1 - b2) / (a2 - a1));
 	res.y = (a1 * res.x + b1);
-	if (res.x < v1.x || res.x > v2.x) {
-		res.x = -1;
-	}
+//	Don't need this check anymore because of wall-clipping
+//	if (res.x < v1.x || res.x > v2.x) {
+//		res.x = -1;
+//	}
 	return res;
 }
 

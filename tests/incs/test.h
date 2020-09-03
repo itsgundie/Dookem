@@ -77,7 +77,7 @@ typedef struct		s_player {
 	float			x;
 	float			y;
 	float			angle;//direction
-	wall			seeing_walls;//?
+	wall			*seeing_walls;//?
 	int				inside;
 }					t_player;
 
@@ -166,10 +166,6 @@ void	add_walls(data	draw);
 void	mouse_events(SDL_Event event, data *draw, int *is_pressed);
 void	key_event(SDL_Event *event, data *draw);
 
-//int		possible_vision(wall *w, t_player *p, vertex *depth);
-void	check();
-//void	update_texture(sdl_win *win, data *draw);
-float	vector_leigh(wall *w);
 #include "3d.h"
 
 #endif //TESTS_TEST_H

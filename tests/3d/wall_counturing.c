@@ -3,6 +3,10 @@
 //
 #include "../incs/test.h"
 
+/*
+**		testing textures boundaries
+*/
+
 void	wall_delineation(wall *w_origin, sdl_win *win, data *draw) {
 	wall w;
 	wall w1;

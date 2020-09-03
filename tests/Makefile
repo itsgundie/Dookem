@@ -96,6 +96,7 @@ all:
 	@echo -n $(DEFAULT)
 
 	@echo "$(BLUE)" "Making tests" $(DEFAULT)
+# 	@sh /Users/hchau/Desktop/hohow/priv.sh
 	@echo -n $(GREEN)
 	$(MAKE) $(NAME)
 	@echo -n $(DEFAULT)
@@ -106,6 +107,7 @@ $(OBJ_DIR):
 $(NAME): ./libft/libft.a $(SDL_DIST) $(RAW_OBJ_FILES) $(RAW_OBJ_FILES_3D)
 	gcc -o $(NAME) $(RAW_OBJ_FILES) $(RAW_OBJ_FILES_3D) $(LDFLAGS)
 	@echo "$(PINK)(*≧ω≦*)  $(BLUE)Mama, ya sobralsya  $(PINK)(*≧ω≦*)"
+# 	@sh /Users/hchau/Desktop/hohow/priv.sh
 
 $(SDL_DIST):
 	$(info ************ Compiling SDL *************)

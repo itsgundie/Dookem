@@ -16,35 +16,61 @@ int		possible_vision(wall *w, t_player *p) {
 	return 0;
 }
 
-static float cross_product_2d(const vertex v1, const vertex v2)
-{
-//	if (v1.y < v2.y)
-//		return (v1.x * v2.y - v1.y * v2.x);
-	return (v1.x * v2.y - v1.y * v2.x);
-//	return (v2.x * v1.y - v2.y * v1.x);
+static vertex	find_new_dot(t_player *p, wall *w) {
+	vertex res;
+
+	vertex v1 = w->left.x <= w->right.x ? w->left : w->right;
+	vertex v2 = w->left.x <= w->right.x ? w->right : w->left;
+
+	float a2 = ((-v2.y + v1.y) / (-v2.x + v1.x + 0.000001));
+	float a1 = -1 / a2;
+	float angle = atan(a1);
+
+	if (fabs(sin(angle)) <= 0.000001 || fabs(cos(angle)) <= 0.000001)
+		angle += 0.0000001;
+	float px1 = cos(angle) > 0 ? p->x : p->x + cos(angle);
+	float py1 = cos(angle) > 0 ? p->y : p->y + sin(angle);
+
+	float b1 = (py1 - (a1 * px1));
+	float b2 = (v1.y - a2 * v1.x);
+
+	res.x = ((b1 - b2) / (a2 - a1));
+	res.y = (a1 * res.x + b1);
+	return res;
+}
+
+static vertex	get_perpendicular_dot(t_player *p, wall *w) {
+	vertex	res;
+
+	if (fabs(w->left.x - w->right.x) <= 0.1)
+	{
+		res.x = w->left.x;
+		res.y = p->y;
+	}
+	else if (fabs(w->left.y - w->right.y) <= 0.1)
+	{
+		res.y = w->left.y;
+		res.x = p->x;
+	}
+	else
+		res = find_new_dot(p, w);
+	if ((w->left.x - res.x) * (w->right.x - res.x) > 0 ||
+			(w->left.y - res.y) * (w->right.y - res.y) > 0) {
+		res.x = -1;
+	}
+	return res;
 }
 
 float	find_destination(wall *w1, t_player *p) {
-	//HOW????
-	//мб лучший варик? Не всегда корректная выборка стен
-	//if you wanna get it, read this carefully:
-	//grafika.me/node/980#:~:text=Расстоянием%20от%20точки%20до%20отрезка,до%20одного%20из%20концов%20отрезка
-	wall *w = malloc(sizeof(wall));
-	w->left = w1->left.x < w1->right.x ? w1->left : w1->right;
-	w->right = w1->right.x < w1->left.x ? w1->right : w1->left;
-	if (cross_product_2d(w->right, w->left) <= 0 || cross_product_2d(w->left, w->right) <= 0) {//слишком широкое определение, нужно только определение тупого угла здесь
-			return pow((pow((p->x - w->right.x), 2) + pow((p->y - w->right.y), 2)), 0.5);
+	vertex hint = get_perpendicular_dot(p, w1);
+	if (hint.x > 0)
+		return sqrt(pow(p->x - hint.x, 2) + pow(p->y - hint.y, 2));
+	if (sqrt(pow(p->x - w1->left.x, 2) + pow(p->y - w1->left.y, 2)) <
+			sqrt(pow(p->x - w1->right.x, 2) + pow(p->y - w1->right.y, 2))) {
+		return sqrt(pow(p->x - w1->left.x, 2) + pow(p->y - w1->left.y, 2));
+	} else {
+		return sqrt(pow(p->x - w1->right.x, 2) + pow(p->y - w1->right.y, 2));
 	}
-	if ((int)(w->right.x - w->left.x) == 0)
-		return fabs(p->y - w->left.y);
-	if ((int)(w->right.y - w->left.y) == 0) {
-		return ((fabs(p->x - w->left.x)));
-	}
-	float a = fabs(w->right.x - w->left.x);
-	float b = fabs(w->right.y - w->left.y);
-	float y = (((a * 2 / b) * w->left.y + a * (p->x - w->left.x) + b * p->y) / ((a * 2 / b) + b) - p->y);
-	float x = ((a / b) * (y - w->left.y) + w->left.x - p->x);
-	return (sqrt((x * x) + (y * y)));
 }
 
 void	sort_by_depth(wall **w, float **depth, int *count) {
@@ -52,7 +78,7 @@ void	sort_by_depth(wall **w, float **depth, int *count) {
 	int		i = 0;
 	float	x;
 	wall	box;
-	while (i < *count) {
+	while (i < *count - 1) {
 		//добавить нормальную!!! сОРтировку
 		if ((*depth)[i] > (*depth)[i + 1]) {
 			x = (*depth)[i];
@@ -70,16 +96,18 @@ void	sort_by_depth(wall **w, float **depth, int *count) {
 
 void	get_walls_in_front(data *draw, wall **w, int *w_count) {
 	int		count = 0;
-	float	*depth = malloc(sizeof(float) * (draw->m->w_count + 2));
-	wall	*new_list = malloc(sizeof(wall) * (draw->m->w_count + 2));//[draw->m->w_count + 1];
+	float	*depth = malloc(sizeof(float) * (draw->m->w_count));
+	wall	*new_list = malloc(sizeof(wall) * (draw->m->w_count));//[draw->m->w_count + 1];
 	int i = 0;
-	while (i <= draw->m->w_count) {
+	while (i < draw->m->w_count) {
 		if (draw->m->walls[i].right.x != -1 && draw->m->walls[i].is_portal == FALSE) {
 			if (possible_vision(&draw->m->walls[i], draw->m->player) == 1) {
 				if (fabs(find_destination(&draw->m->walls[i], draw->m->player)) < 100) {
 					(*w)[count] = draw->m->walls[i];
 					new_list[count] = draw->m->walls[i];
-					depth[count] = fabs(find_destination(&draw->m->walls[i], draw->m->player));
+					depth[count] = (find_destination(&draw->m->walls[i], draw->m->player));
+					printf("%f\n", depth[count]);
+
 					count++;
 				}
 			}

@@ -1,6 +1,3 @@
-//
-// Created by Hugor Chau on 7/27/20.
-//
 #include "../incs/test.h"
 void init_rect(sdl_win *init) {
     SDL_Rect *background_RECT;//img-size
@@ -11,11 +8,6 @@ void init_rect(sdl_win *init) {
     background_RECT->h = SCREEN_HEIGHT;
 	init->rect = background_RECT;
 }
-
-//void init_surface(sdl_win *init) {
-//	SDL_Surface		*surface;
-//	surface = (SDL_Surface *)malloc(sizeof(SDL_Surface));
-//}
 
 void init_wall_img(sdl_win *init, char *name, int num) {
 	SDL_Surface *loadedImage = SDL_LoadBMP(name);
@@ -53,7 +45,6 @@ void init_window(sdl_win *init, char *name) {
 	init_wall_img(init, "./extra_src/9.bmp", 1);
 	init_wall_img(init, "./extra_src/14.bmp", 2);
 
-//    init_surface(init);
 	init_texture(init);
 	init->update_texture = &update_texture;
 }

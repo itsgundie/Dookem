@@ -47,10 +47,105 @@ void	draw_fov(sdl_win *win, data *draw) {
 //	draw_line(&w, win->bmap, 0xFF00FF00);
 }
 
+//static float	find_perpendicular_angle(wall *w, t_player *p) {
+//	float res;
+//
+//	vertex v1 = w->left.x <= w->right.x ? w->left : w->right;
+//	vertex v2 = w->left.x <= w->right.x ? w->right : w->left;
+//
+//	float a1 = ((-v2.y + v1.y) / (-v2.x + v1.x + 0.000001));
+//	res = tan(atan(a1) * -1);
+//	return res;
+//}
+//
+//static vertex	find_new_dot(data *draw, wall *w, float angle) {
+//	vertex res;
+//
+//	vertex v1 = w->left.x <= w->right.x ? w->left : w->right;
+//	vertex v2 = w->left.x <= w->right.x ? w->right : w->left;
+//
+//	if (fabs(sin(angle)) <= 0.000001 || fabs(cos(angle)) <= 0.000001)
+//		angle += 0.0000001;
+//	float px1 = cos(angle) > 0 ? draw->m->player->x : draw->m->player->x + cos(angle);
+//	float py1 = cos(angle) > 0 ? draw->m->player->y : draw->m->player->y + sin(angle);
+//
+//	float a1 = tan(angle);
+//	float a2;
+//	a2 = ((-v2.y + v1.y) / (-v2.x + v1.x + 0.000001));
+//
+//	float b1 = (py1 - (a1 * px1));
+//	float b2 = (v1.y - a2 * v1.x);
+//
+//	res.x = ((b1 - b2) / (a2 - a1));
+//	res.y = (a1 * res.x + b1);
+////	if (res.x < v1.x || res.x > v2.x) {
+////		res.x = -1;
+////	}
+//	return res;
+//}
+//static float	find_perpendicular_angle(wall *w) {
+//	float res;
+//
+//	vertex v1 = w->left.x <= w->right.x ? w->left : w->right;
+//	vertex v2 = w->left.x <= w->right.x ? w->right : w->left;
+//
+//	float res = atan(-1 / a1);
+//	printf("%f = res\n", res);
+//	return res;
+//}
+
+static vertex	find_new_dot(t_player *p, wall *w) {
+	vertex res;
+
+	vertex v1 = w->left.x <= w->right.x ? w->left : w->right;
+	vertex v2 = w->left.x <= w->right.x ? w->right : w->left;
+
+	float a2 = ((-v2.y + v1.y) / (-v2.x + v1.x + 0.000001));
+	float a1 = -1 / a2;
+	float angle = atan(a1);
+
+	if (fabs(sin(angle)) <= 0.000001 || fabs(cos(angle)) <= 0.000001)
+		angle += 0.0000001;
+	float px1 = cos(angle) > 0 ? p->x : p->x + cos(angle);
+	float py1 = cos(angle) > 0 ? p->y : p->y + sin(angle);
+
+	float b1 = (py1 - (a1 * px1));
+	float b2 = (v1.y - a2 * v1.x);
+
+	res.x = ((b1 - b2) / (a2 - a1));
+	res.y = (a1 * res.x + b1);
+//	if (res.x < v1.x || res.x > v2.x) {
+//		res.x = -1;
+//	}
+	return res;
+}
+
+static vertex	get_perpendicular_dot(t_player *p, wall *w) {
+	vertex	res;
+
+	if (fabs(w->left.x - w->right.x) <= 0.1)
+	{
+		res.x = w->left.x;
+		res.y = p->y;
+	}
+	else if (fabs(w->left.y - w->right.y) <= 0.1)
+	{
+		res.y = w->left.y;
+		res.x = p->x;
+	}
+	else
+		res = find_new_dot(p, w);
+	if ((w->left.x - res.x) * (w->right.x - res.x) > 0 ||
+			(w->left.y - res.y) * (w->right.y - res.y) > 0)
+	{
+		res.x = -1;
+	}
+	return res;
+}
 void	clear_bitmap(sdl_win *win, data *draw) {
 	int i;
 	wall *wal;
-	wal = malloc(sizeof(wall) * ((draw->m->w_count + 1) * 2));
+	wal = malloc(sizeof(wall) * ((draw->m->w_count) * 2));
 	int w_count = 0;
 	i = 0;
 	while (i < (SCREEN_WIDTH) * (SCREEN_HEIGHT) * 4) {
@@ -61,7 +156,7 @@ void	clear_bitmap(sdl_win *win, data *draw) {
 		i += 4;
 	}
 	i = 0;
-	while (i <= draw->m->w_count) {
+	while (i < draw->m->w_count) {
 		if (draw->m->walls[i].right.x != -1) {
 			if (draw->m->walls[i].is_portal == FALSE)
 				draw_line(&draw->m->walls[i], win->bmap, 0x00FFFFFF);
@@ -80,13 +175,22 @@ void	clear_bitmap(sdl_win *win, data *draw) {
 	while (i < w_count) {
 		if (wal[i].right.x != -1) {
 			draw_line(&wal[i], win->bmap, 0x00000000);
-//			wall check;
-//			{
-//				check.right = change_dot(draw, wal[i].left, &wal[i]);
-//				check.left.x = draw->m->player->x;// = change_dot(draw, w.left, &w);
-//				check.left.y = draw->m->player->y;
-//				draw_line(&check, win->bmap, 0xFFFFFF00);
-//			}
+			{
+				wall check;
+
+//				check.left.x = wal[i].right.y;
+//				check.left.y = wal[i].right.x;// = change_dot(draw, w.left, &w);
+//				check.right.x = wal[i].left.y;
+//				check.right.y = wal[i].left.x;
+//				float angle1 = find_perpendicular_angle(&wal[i]);
+				check.left.x = draw->m->player->x;
+				check.left.y = draw->m->player->y;
+
+				check.right = get_perpendicular_dot(draw->m->player, &wal[i]);
+//				printf("%f, %f, %f, %f\n", check.left.x, check.left.y, check.right.x, check.right.y);
+				if (check.right.x > 0)
+				draw_line(&check, win->bmap, 0x00FF00FF);
+			}
 		}
 		i++;
 	}

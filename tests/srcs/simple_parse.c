@@ -5,7 +5,6 @@
 
 wall	*create_new_wall(char *str, wall *w) {
 
-//	w = malloc(sizeof(wall));
 	w->left.x = -1;
 	w->height = 20;
 	while (*str && (*str == 'w' || *str == 'a' || *str == 'l'))
@@ -62,7 +61,7 @@ void	get_string_to_struct(char *str, map *m) {
 			m->walls[count].is_portal = FALSE;
 			count++;
 		}
-		if (*str == 'p') {
+		else if (*str == 'p') {
 			if (*(str + 1) == 'o') {
 				create_new_wall(str, &m->walls[count]);
 				m->walls[count].is_portal = TRUE;
@@ -74,7 +73,6 @@ void	get_string_to_struct(char *str, map *m) {
 		}
 		str++;
 	}
-
 }
 
 void	check_borders(float *check, int max) {
@@ -99,7 +97,7 @@ map		*simple_parse(char *map_name) {
 			error("Map error. Not a file.", 2);
 		else {
 			m->w_count = 0;
-			m->walls = malloc(100 * (sizeof(wall)));
+			m->walls = malloc(200 * (sizeof(wall)));
 			m->is_new = TRUE;
 			return (m);
 		}

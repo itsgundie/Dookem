@@ -16,7 +16,8 @@ float	find_angle(data *draw, vertex w1) {
 	res = -(((v1.x * v2.x + v1.y * v2.y) / (sqrt(v1.x * v1.x + v1.y * v1.y)
 											* sqrt(v2.x * v2.x + v2.y * v2.y))));
 
-	res = res >= 1 ? acos(1) : acos(res);
+	res = res >= 1 ? acos(1) : res <= -1 ? acos(-1) : acos(res);
+//	res = res <= -0.999 ? acos(-1) : acos(res);
 	res = (180 / M_PI * res) / 90.0;
 	return res;
 }
@@ -69,6 +70,7 @@ void	draw_wall(wall *w_origin, sdl_win *win, data *draw) {
 	float		angle;
 	float		angle_step;
 
+	//preparations
 	w.right = horizontal_clipping(draw, w_origin->right, w_origin);
 	w.left = horizontal_clipping(draw, w_origin->left, w_origin);
 	if (w.left.x < 0 || w.right.x < 0)
@@ -84,6 +86,8 @@ void	draw_wall(wall *w_origin, sdl_win *win, data *draw) {
 		angle = 1;
 		angle_step *= -1;
 	}
+
+	//texture mapping algorithm
 	while (borders.left.x < end_x)
 	{
 		borders.right.x = (int)borders.left.x;
@@ -97,5 +101,6 @@ void	draw_wall(wall *w_origin, sdl_win *win, data *draw) {
 		angle += angle_step;
 		borders.right.y -= step_y;
 	}
-	wall_delineation(w_origin, win, draw);
+//	printf("%f, %f, %f, %f\n", w.left.x, w.left.y, w.right.x, w.right.y);
+//	wall_delineation(w_origin, win, draw);
 }
