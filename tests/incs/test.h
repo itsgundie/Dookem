@@ -138,6 +138,11 @@ void	draw_line(wall *w, unsigned char **pix_array, int color);
 void	update_texture(sdl_win *win, data *draw);
 
 /*
+**		texture mapping
+*/
+float 	find_textel(float angle, vertex textels, vertex dist, int text_max);
+
+/*
 **		checking 3D-boundaries
 */
 void	wall_delineation(wall *w_origin, sdl_win *win, data *draw);
