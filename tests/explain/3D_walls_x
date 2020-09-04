@@ -1,0 +1,29 @@
+Well, concept of making wall from 2D to 3D in Doom is pretty easy -
+at first we need to find it's x's on the screen. To do that, you need
+to clip visible part of wall correctly (to see explaining of this algorithm
+open file "horizontal_clipping.txt" and check out code in
+"horizontal_clipping.c").
+
+The rendering part of whole algorithm (with perspective-corrected texture
+mapping, btw) you can find in "draw_wall.c".
+
+Every of wall vertexes are calculating separately, than those data are
+extrapolating to all wall in 3D view.
+
+At first we need to find an angle from the left ray of FOV
+(angle - DEGREES_45) and vertex. We can find it by formula in
+"find_angle" function. So, if we know, that player's FOV is
+always 90 degrees, the mentioned angle will be some percent of
+this FOV. All we need to transform this to screen x's is divide
+it by 90 (if 90 is 100%) and multiply by SCREEN_WIDTH.
+
+Wall's height is simply calculated by formula:
+wall's width (it is 40 for now, but should be in params of wall, I guess)
+divided by destination from player to vertex and multiply by SCREEN_HEIGHT and
+tangent of half FOV (90 / 2 = 45):
+wall_width / destination_from_player_to_vertex * ((SCREEN_HEIGHT / 2) / tan(FOV / 2)).
+
+Than when we've got those numbers, we know wall's extreme points on the screen.
+
+And, of course, texture mapping for walls. Guys, it was hell. Just ask me in person,
+it would be better.

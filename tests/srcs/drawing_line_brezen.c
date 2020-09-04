@@ -1,5 +1,5 @@
 //
-// Created by Hugor Chau on 7/28/20.
+// Created by Hugor Chau on 9/3/20.
 //
 
 #include "../incs/test.h"
@@ -25,7 +25,7 @@ void	draw_line(wall *w, unsigned char **pix_array, int color) {
 	if (abs(x1 - x0) > abs(y1 - y0)) {
 		while (x != x1) {
 			if (x >= 0 && y >= 0 && x < SCREEN_WIDTH && y < SCREEN_HEIGHT)
-			((int *)(*pix_array))[((x) + y * SCREEN_WIDTH) - 0] = color;
+				((int *)(*pix_array))[((x) + y * SCREEN_WIDTH) - 0] = color;
 			error = error + deltaerr;
 			if (error >= (deltax + 1)) {
 				y = y + diry;

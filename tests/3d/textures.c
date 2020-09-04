@@ -1,6 +1,7 @@
 #include "../incs/test.h"
 
-//add perspective correction by height to make textures with incline (наклон)
+//add perspective correction by height to make textures with incline (добавить
+// коррекцию текстурирования для стен с наклоном на будущее)
 
 void	draw_text(wall borders, float text_x, sdl_win *win, int text_num) {
 	float step = (float)win->wall_img[0]->height / (fabs((borders.right.y) - (borders.left.y)));

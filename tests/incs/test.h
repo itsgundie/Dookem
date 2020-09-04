@@ -116,9 +116,15 @@ void	init_window(sdl_win *init, char *name);
 void	main_loop(sdl_win *win, sdl_win *win3d, data *draw);
 int 	inside (long x, long y, data *draw);
 int 	inside_vp(float x, float y, data *draw);
-void	get_walls_in_front(data *draw, wall **w, int *w_count);
 void	draw_line(wall *w, unsigned char **pix_array, int color);
+
+/*
+**		potential visible walls
+*/
+void	get_walls_in_front(data *draw, wall **w, int *w_count);
 void	update_texture(sdl_win *win, data *draw);
+float	find_destination(wall *w1, t_player *p);
+vertex	get_perpendicular_dot(t_player *p, wall *w);
 
 /*
 **		3D

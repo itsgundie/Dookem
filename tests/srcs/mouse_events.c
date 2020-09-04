@@ -23,7 +23,6 @@ void	mouse_events(SDL_Event event, data *draw, int *is_pressed) {
 			draw->m->walls[draw->m->w_count].right.x = -1;
 		}
 		*is_pressed = TRUE;
-		SDL_Log("OOOOOOOOOOOOOO");
 	}
 	if (event.type == SDL_MOUSEBUTTONUP && event.button.button == SDL_BUTTON_LEFT) {
 		draw->m->walls[draw->m->w_count].right.x = event.button.x;
@@ -32,6 +31,5 @@ void	mouse_events(SDL_Event event, data *draw, int *is_pressed) {
 		*is_pressed = FALSE;
 		if (draw->m->is_new == FALSE)
 			return;
-		SDL_Log("NOOOOOOOOOOOOO!");
 	}
 }

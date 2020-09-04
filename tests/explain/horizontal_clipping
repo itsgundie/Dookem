@@ -1,0 +1,22 @@
+To find correct angle (see also "3D_walls_x" file) and make right texture mapping,
+we need to know, where wall's visible part is ending. To do that we use simple
+wall clipping algorithm.
+
+This operation should be done for every wall's vertexes.
+
+At first, lets find out, is our vertex behind player's back - in that case we need
+extra clip. Than new dot should be clipped by one of FOV's rays.
+
+To recognize this case we're using function:
+int	is_overlap(data *draw, vertex w1, float angle).
+I don't remember well how it works, but the concept is simple:
+we're trying to find cos of angle between our vertex and ray
+from player with mentioned angle (player->angle + 45_DEGREES or
+player->angle - 45_DEGREES = FOV). If it is less than 0,
+dot is placed behind player's back.
+
+The new dot is point, where wall was crossed by one of FOV's rays (we know which one
+because of "is_overlap" function). To find this dot, we use formula:
+https://vscode.ru/prog-lessons/nayti-tochku-peresecheniya-otrezkov.html
+
+I'm to lazy right now to explain it in words, so just read this article, please.

@@ -32,12 +32,13 @@ C_FILES = main.c \
 		 main_loop.c \
 		 error.c \
 		 simple_parse.c \
-		 dda.c \
 		 add_walls.c \
 		 mouse_events.c \
 		 key_event.c \
 		 is_inside.c \
-		 possible_vision.c
+		 possible_vision.c \
+		 find_destination.c \
+		 drawing_line_brezen.c
 
 C_FILES_3D = 	init_3d.c \
                 update_image.c \

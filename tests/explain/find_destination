@@ -1,0 +1,23 @@
+Well, lets fun part begin.
+
+The smallest distance from player to wall (segment, that is indicated by 2 vertexes),
+is length of perpendicular, one of vertexes of which is our player's pos, and the
+second should be placed on our wall. If this perpendicular doesn't exist, required
+value is distance from player to the nearest wall's vertex.
+
+As we see in the 1_illustration.png, if perpendicular doesn't correspond this
+demands, destination could be incorrect.
+
+Finding hit was made very familiar as wall's clipping.
+
+At first, we know, that line, which is perpendicular to given, would have
+angular coefficient, satisfying the equation:
+k1 * k2 = -1.
+
+k1 and k2 are tangents of angle. So, our perpendicular should be such a line,
+that have one point in player's pos, and angle atan(k2). And we already know,
+how to find crossing point of two lines (what is this, crossover episode?).
+See here:
+https://vscode.ru/prog-lessons/nayti-tochku-peresecheniya-otrezkov.html
+
+Soooooooo we did it!
