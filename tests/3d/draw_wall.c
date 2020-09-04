@@ -101,5 +101,5 @@ void	draw_wall(wall *w_origin, sdl_win *win, data *draw) {
 		borders.right.y -= step_y;
 	}
 	//это проверка - обводит стенки розовым, чтобы проверить исходные размеры стен
-//	wall_delineation(w_origin, win, draw);
+	wall_delineation(w_origin, win, draw);
 }

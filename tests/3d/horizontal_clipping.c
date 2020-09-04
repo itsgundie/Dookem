@@ -11,14 +11,14 @@ static vertex	find_new_dot(data *draw, wall *w, float angle) {
 	vertex v1 = w->left.x <= w->right.x ? w->left : w->right;
 	vertex v2 = w->left.x <= w->right.x ? w->right : w->left;
 
-	if (fabs(sin(angle)) <= 0.000001 || fabs(cos(angle)) <= 0.000001)
-		angle += 0.0000001;
+	if (fabs(sin(angle)) <= 0.00001 || fabs(cos(angle)) <= 0.00001)
+		angle += 0.00001;
 	float px1 = cos(angle) > 0 ? draw->m->player->x : draw->m->player->x + cos(angle);
 	float py1 = cos(angle) > 0 ? draw->m->player->y : draw->m->player->y + sin(angle);
 
 	float a1 = tan(angle);
 	float a2;
-	a2 = ((-v2.y + v1.y) / (-v2.x + v1.x + 0.000001));
+	a2 = ((-v2.y + v1.y) / (-v2.x + v1.x + 0.00001));
 
 	float b1 = (py1 - (a1 * px1));
 	float b2 = (v1.y - a2 * v1.x);
@@ -65,7 +65,7 @@ vertex	horizontal_clipping(data *draw, vertex original_dot, wall *full_wall) {
 /*
 **	clip wall, if one of it's vertexes is partly behind FOV-vectors
 */
-	if (is_overlap(draw, original_dot, draw->m->player->angle) == TRUE)
+	if (is_overlap(draw, res, draw->m->player->angle) == TRUE)
 	{
 		res = (find_new_dot(draw, full_wall, draw->m->player->angle + DEGREES_45 * 2));
 	}
